@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Shopping Cart - Cactus Cat Software{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row">
+    <div class="col-lg-10 mx-auto">
+      <h1 class="display-5 fw-bold mb-4">Shopping Cart</h1>
+
+      {% if cart %}
+        <div class="card">
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Service</th>
+                    <th class="text-muted" style="font-size: 0.875rem;">Price</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for item in cart %}
+                    <tr>
+                      <td>
+                        <h5 class="mb-2">{{ item.service.name }}</h5>
+                        <p class="text-muted mb-1">{{ item.service.short_description }}</p>
+                        <small class="text-muted">{{ item.service.service.name }}</small>
+                      </td>
+                      <td class="text-muted align-middle" style="font-size: 0.875rem;">${{ item.price }}</td>
+                      <td class="align-middle">
+                        <form method="post" action="{% url 'orders:cart_remove' item.service.id %}" class="d-inline">
+                          {% csrf_token %}
+                          <button type="submit" class="btn btn-sm btn-outline-danger" title="Remove from cart">
+                            <i class="bi bi-trash"></i>
+                          </button>
+                        </form>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td class="text-end"><strong>Total:</strong></td>
+                    <td colspan="2" class="text-muted"><strong>${{ cart.get_total_price }}</strong></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+
+            <div class="d-flex justify-content-between mt-4">
+              <a href="{% url 'services:catalog' %}" class="btn btn-outline-primary">
+                <i class="bi bi-arrow-left me-2"></i>Continue Shopping
+              </a>
+              <a href="{% url 'orders:cart_checkout' %}" class="btn btn-primary">
+                Proceed to Checkout
+              </a>
+            </div>
+          </div>
+        </div>
+
+     
+      {% else %}
+        <div class="card text-center py-5">
+          <div class="card-body">
+            <i class="bi bi-cart-x" style="font-size: 4rem; color: var(--muted-text);"></i>
+            <h3 class="h5 mt-4 mb-3">Your cart is empty</h3>
+            <p class="text-muted mb-4">Add some services to get started!</p>
+            <a href="{% url 'services:catalog' %}" class="btn btn-primary">
+              Browse Services
+            </a>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

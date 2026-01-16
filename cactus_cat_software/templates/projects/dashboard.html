@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}My Dashboard{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <h1 class="display-5 fw-bold mb-4">Account Dashboard</h1>
+
+  <div class="row">
+    <!-- Left Column: Projects & Orders -->
+    <div class="col-lg-8">
+      <!-- Orders Section -->
+      <section class="mb-5">
+        <h2 class="h4 mb-3">Orders</h2>
+        {% if orders %}
+          <div class="row g-3">
+            {% for order in orders %}
+              <div class="col-12">
+                <div class="card">
+                  <div class="card-body">
+                    <div class="row align-items-center">
+                      <div class="col-md-8">
+                        <div class="d-flex align-items-center mb-2">
+                          <h3 class="h5 mb-0 me-3">Order #{{ order.order_number }}</h3>
+                          <span class="badge bg-{% if order.status == 'pending' %}warning{% elif order.status == 'confirmed' %}info{% elif order.status == 'in_progress' %}primary{% elif order.status == 'completed' %}success{% else %}danger{% endif %}">
+                            {{ order.get_status_display }}
+                          </span>
+                        </div>
+                        <p class="text-muted small mb-2">Placed on {{ order.created|date:"F d, Y" }}</p>
+                        {% if order.items.exists %}
+                          <div class="mt-2">
+                            {% for item in order.items.all %}
+                              <div class="mb-1">
+                                <strong>{{ item.service_package.name }}</strong>
+                                <p class="text-muted small mb-0">{{ item.service_package.short_description }}</p>
+                              </div>
+                            {% endfor %}
+                          </div>
+                        {% else %}
+                          <div class="mt-2">
+                            <strong>{{ order.service_package.name }}</strong>
+                            <p class="text-muted small mb-0">{{ order.service_package.short_description }}</p>
+                          </div>
+                        {% endif %}
+                      </div>
+                      <div class="col-md-4 text-md-end">
+                        <p class="text-muted small mb-2">Estimated: ${{ order.total_amount }}</p>
+                        <a href="{% url 'orders:detail' order.order_number %}" class="btn btn-sm btn-outline-primary">
+                          View Details
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="card">
+            <div class="card-body text-center py-4">
+              <i class="bi bi-receipt" style="font-size: 2.5rem; color: var(--muted-text);"></i>
+              <h3 class="h6 mt-3">No orders yet</h3>
+              <p class="text-muted mb-3">Browse our services and place your first order!</p>
+              <a href="{% url 'services:catalog' %}" class="btn btn-primary btn-sm">
+                Browse Services
+              </a>
+            </div>
+          </div>
+        {% endif %}
+      </section>
+
+      <!-- Projects Section -->
+      <section>
+        <h2 class="h4 mb-3">Projects</h2>
+        {% if projects %}
+          <div class="row g-4">
+            {% for project in projects %}
+              {% include "projects/includes/project_card.html" %}
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="card">
+            <div class="card-body text-center py-4">
+              <i class="bi bi-folder" style="font-size: 2.5rem; color: var(--muted-text);"></i>
+              <h3 class="h6 mt-3">No active projects yet</h3>
+              <p class="text-muted mb-0">
+                Once your order is approved, your project will appear here.
+              </p>
+            </div>
+          </div>
+        {% endif %}
+      </section>
+    </div>
+
+    <!-- Right Column: User Info & Business Info -->
+    <div class="col-lg-4">
+      <!-- User Information Card -->
+      <section class="mb-4">
+        <h2 class="h4 mb-3">Account Information</h2>
+        <div class="card">
+          <div class="card-body">
+          
+            <div class="mb-3">
+              <label class="text-muted small mb-1">Email</label>
+              <p class="mb-2">{{ user.email }}</p>
+              <a href="{% url 'account_email' %}" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-envelope me-1"></i>Change Email
+              </a>
+            </div>
+            <div class="mb-0">
+              <label class="text-muted small mb-1">Password</label>
+              <p class="mb-2">••••••••</p>
+              <a href="{% url 'account_change_password' %}" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-lock me-1"></i>Change Password
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Business Information Card -->
+      <section>
+        <h2 class="h4 mb-3">Business Information</h2>
+        <div class="card">
+          <div class="card-body">
+            <p class="text-muted small mb-3">
+              Add your business details to speed up future orders
+            </p>
+            <div class="mb-3">
+              <label class="text-muted small mb-1">Company Name</label>
+              <p class="mb-0">{{ user.company_name|default:"Not set" }}</p>
+            </div>
+            <div class="mb-3">
+              <label class="text-muted small mb-1">Phone Number</label>
+              <p class="mb-0">{{ user.phone_number|default:"Not set" }}</p>
+            </div>
+            <div class="mb-3">
+              <label class="text-muted small mb-1">Website</label>
+              <p class="mb-0">
+                {% if user.website %}
+                  <a href="{{ user.website }}" target="_blank" rel="noopener noreferrer">{{ user.website }}</a>
+                {% else %}
+                  Not set
+                {% endif %}
+              </p>
+            </div>
+            <div class="mb-3">
+              <label class="text-muted small mb-1">Additional Contacts</label>
+              <p class="mb-0" style="white-space: pre-line;">{{ user.additional_contacts|default:"Not set" }}</p>
+            </div>
+            <div class="mb-0">
+              <a href="{% url 'users:update' %}" class="btn btn-sm btn-primary w-100">
+                <i class="bi bi-pencil me-1"></i>Update Business Info
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+{% endblock %}

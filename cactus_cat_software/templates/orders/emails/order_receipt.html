@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Confirmation</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .header {
+      background-color: #83A384;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      border-radius: 8px 8px 0 0;
+    }
+    .content {
+      background-color: #f5f5f5;
+      padding: 30px;
+      border-radius: 0 0 8px 8px;
+    }
+    .card {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .detail-label {
+      font-weight: 600;
+      color: #666;
+    }
+    .total {
+      font-size: 16px;
+      color: #666;
+      font-weight: normal;
+    }
+    .service-name {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 8px;
+    }
+    .service-description {
+      color: #666;
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 4px;
+    }
+    .button {
+      display: inline-block;
+      padding: 12px 30px;
+      background-color: #83A384;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      margin: 20px 0;
+    }
+    .footer {
+      text-align: center;
+      color: #666;
+      font-size: 14px;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1 style="margin: 0;">🌵 {{ site_name }}</h1>
+    <p style="margin: 10px 0 0 0;">Order Confirmation</p>
+  </div>
+
+  <div class="content">
+    <h2>Thank you for your order, {{ order.customer_name }}!</h2>
+    <p>We have received your order and are excited to work with you.</p>
+
+    <div class="card">
+      <h3 style="margin-top: 0;">Order Details</h3>
+      <div class="detail-row">
+        <span class="detail-label">Order Number:</span>
+        <span><strong>{{ order.order_number }}</strong></span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Order Date:</span>
+        <span>{{ order.created|date:"F d, Y" }}</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top: 0;">Services Requested</h3>
+      {% if order.items.exists %}
+        {% for item in order.items.all %}
+          <div style="padding: 15px 0; border-bottom: 1px solid #eee;">
+            <div class="service-name">{{ item.service_package.name }}</div>
+            {% if item.service_package.short_description %}
+              <div class="service-description">{{ item.service_package.short_description }}</div>
+            {% endif %}
+            <div style="color: #999; font-size: 12px; margin-top: 8px;">${{ item.get_total_price }}</div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div style="padding: 15px 0; border-bottom: 1px solid #eee;">
+          <div class="service-name">{{ order.service_package.name }}</div>
+          {% if order.service_package.short_description %}
+            <div class="service-description">{{ order.service_package.short_description }}</div>
+          {% endif %}
+          <div style="color: #999; font-size: 12px; margin-top: 8px;">${{ order.total_amount }}</div>
+        </div>
+      {% endif %}
+      <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #ddd; text-align: right;">
+        <span class="detail-label" style="font-size: 14px;">Estimated Total: </span>
+        <span class="total">${{ order.total_amount }}</span>
+      </div>
+    </div>
+
+    {% if order.custom_requirements %}
+      <div class="card">
+        <h3 style="margin-top: 0;">Custom Requirements</h3>
+        <p>{{ order.custom_requirements|linebreaks }}</p>
+      </div>
+    {% endif %}
+
+    <div class="card">
+      <h3 style="margin-top: 0;">What's Next?</h3>
+      <p>Our team will review your order and reach out to you within 1-2 business days to discuss the project details and next steps.</p>
+    </div>
+
+    <div style="text-align: center;">
+      <p>Have questions? Feel free to reach out to us anytime.</p>
+      <p><strong>Email:</strong> hello@cactuscatsoftware.com</p>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>© {% now "Y" %} {{ site_name }}. All rights reserved.</p>
+  </div>
+</body>
+</html>

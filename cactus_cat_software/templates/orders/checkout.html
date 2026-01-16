@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load static crispy_forms_tags %}
+
+{% block title %}Checkout - {{ service.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row">
+    <div class="col-lg-8 mx-auto">
+      <h1 class="display-5 fw-bold mb-4">Checkout</h1>
+
+      <div class="card mb-4">
+        <div class="card-body">
+          <h2 class="h4 mb-3">Order Summary</h2>
+          <div class="row">
+            {% if service.image %}
+              <div class="col-md-3">
+                <img src="{{ service.image.url }}" class="img-fluid rounded" alt="{{ service.name }}">
+              </div>
+            {% endif %}
+            <div class="col-md-{{ service.image|yesno:'9,12' }}">
+              <h3 class="h4 mb-3">{{ service.name }}</h3>
+              <p class="mb-3">{{ service.short_description }}</p>
+              <p class="text-muted small mb-0">
+                {% if service.is_price_starting_from %}
+                  Starting from
+                {% endif %}
+                ${{ service.price }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-body">
+          <h2 class="h4 mb-4">Contact Information</h2>
+          <form method="post">
+            {% csrf_token %}
+            {% crispy form %}
+          </form>
+          <div class="alert alert-info mt-3">
+            <i class="bi bi-info-circle"></i>
+            <strong>Note:</strong> You don't need an account to request a quote.
+            {% if not user.is_authenticated %}
+              However, if you <a href="{% url 'account_signup' %}?next={{ request.path }}">create an account</a>,
+              you'll be able to track your project status, give input, and view invoices.
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

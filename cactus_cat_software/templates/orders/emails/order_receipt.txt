@@ -1,0 +1,31 @@
+Thank you for your order!
+
+Dear {{ order.customer_name }},
+
+We have received your order for {{ order.service_package.name }}.
+
+Order Details:
+--------------
+Order Number: {{ order.order_number }}
+Order Date: {{ order.created|date:"F d, Y" }}
+Service: {{ order.service_package.name }}
+Total Amount: ${{ order.total_amount }}
+
+{% if order.custom_requirements %}
+Custom Requirements:
+{{ order.custom_requirements }}
+{% endif %}
+
+What's Next?
+------------
+Our team will review your order and reach out to you within 1-2 business days to discuss the project details and next steps.
+
+You can view your order status at any time by visiting:
+{{ site_name }}
+
+If you have any questions, please don't hesitate to contact us at hello@cactuscatsoftware.com
+
+Thank you for choosing {{ site_name }}!
+
+Best regards,
+The Cactus Cat Software Team

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Our Services{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="text-center mb-5">
+    <h1 class="display-4 fw-bold">Our Services</h1>
+    <p class="lead text-muted">Professional solutions tailored to your needs</p>
+  </div>
+
+  {% for category in categories %}
+    <section class="mb-5">
+      <div class="d-flex align-items-center mb-4">
+        {% if category.icon %}
+          <i class="bi {{ category.icon }} me-3" style="font-size: 2rem; color: var(--accent-green);"></i>
+        {% endif %}
+        <div>
+          <h2 class="mb-1">{{ category.name }}</h2>
+          {% if category.description %}
+            <p class="text-muted mb-0">{{ category.description }}</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="row g-4">
+        {% for package in packages %}
+          {% if package.category == category %}
+            {% include "services/includes/service_card.html" with service=package %}
+          {% endif %}
+        {% endfor %}
+      </div>
+    </section>
+  {% endfor %}
+
+  {% if not categories %}
+    <div class="text-center py-5">
+      <p class="text-muted">No services available at the moment. Please check back later.</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

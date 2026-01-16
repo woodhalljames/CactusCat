@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% load static crispy_forms_tags %}
+
+{% block title %}Checkout - Cactus Cat Software{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row">
+    <div class="col-lg-8 mx-auto">
+      <h1 class="display-5 fw-bold mb-4">Checkout</h1>
+
+      <div class="row">
+        <!-- Order Summary -->
+        <div class="col-md-5 mb-4">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="h5 mb-0">Order Summary</h2>
+            </div>
+            <div class="card-body">
+              <ul class="list-unstyled mb-3">
+                {% for item in cart %}
+                  <li class="mb-3 pb-3 border-bottom">
+                    <div>
+                      <h5 class="mb-2">{{ item.service.name }}</h5>
+                      <p class="text-muted small mb-2">{{ item.service.short_description }}</p>
+                      <small class="text-muted" style="font-size: 0.75rem;">${{ item.total_price }}</small>
+                    </div>
+                  </li>
+                {% endfor %}
+              </ul>
+              <div class="d-flex justify-content-between border-top pt-3">
+                <span class="text-muted">Estimated Total:</span>
+                <span class="text-muted">${{ cart.get_total_price }}</span>
+              </div>
+              <div class="alert alert-info mt-3 mb-0">
+                <small>
+                  <i class="bi bi-info-circle me-1"></i>
+                  No payment required now. We'll send you a detailed quote within 24 hours.
+                </small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Checkout Form -->
+        <div class="col-md-7">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="h5 mb-0">Contact & Business Information</h2>
+            </div>
+            <div class="card-body">
+              <p class="text-muted mb-4">
+                Please provide your contact details so we can send you a quote and keep you updated on your project.
+              </p>
+              {% crispy form %}
+            </div>
+          </div>
+
+          <div class="card mt-3">
+            <div class="card-body">
+              <h3 class="h6 mb-3">
+                <i class="bi bi-shield-check me-2" style="color: var(--primary);"></i>
+                What Happens Next
+              </h3>
+              <ol class="mb-0 ps-3">
+                <li class="mb-2 text-muted small">We'll review your order and schedule a meeting</li>
+                <li class="mb-2 text-muted small">Once approved, we'll create your project dashboard</li>
+                <li class="mb-2 text-muted small">Track progress and receive updates every step of the way</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

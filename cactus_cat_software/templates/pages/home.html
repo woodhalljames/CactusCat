@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Home - Cactus Cat Software{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 mx-auto text-center">
+        <h1 class="display-3 fw-bold">
+          Building <span class="accent">Digital Solutions</span> for Tomorrow
+        </h1>
+        <p class="lead mb-4">
+          Professional web development, app development, and cybersecurity services
+          tailored to your business needs.
+        </p>
+        <div class="d-flex gap-3 justify-content-center flex-wrap">
+          <a href="{% url 'services:catalog' %}" class="btn btn-primary btn-lg px-5">
+            View Our Services
+          </a>
+          <a href="{% url 'contact' %}" class="btn btn-outline-primary btn-lg px-5">
+            Get in Touch
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Featured Services Section -->
+<section class="container py-5">
+  <div class="text-center mb-5">
+    <h2 class="display-6 fw-bold">Our Services</h2>
+    <p class="lead text-muted">What we can build for you</p>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-md-6 col-lg-3">
+      <div class="card text-center h-100">
+        <div class="card-body">
+          <i class="bi bi-code-slash" style="font-size: 3rem; color: var(--accent-green);"></i>
+          <h3 class="h5 mt-3">Web Development</h3>
+          <p class="text-muted">Custom websites and web applications built with modern technologies</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+      <div class="card text-center h-100">
+        <div class="card-body">
+          <i class="bi bi-phone" style="font-size: 3rem; color: var(--accent-green);"></i>
+          <h3 class="h5 mt-3">App Development</h3>
+          <p class="text-muted">Mobile and desktop applications that users love</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+      <div class="card text-center h-100">
+        <div class="card-body">
+          <i class="bi bi-gear" style="font-size: 3rem; color: var(--accent-green);"></i>
+          <h3 class="h5 mt-3">Tech Consulting</h3>
+          <p class="text-muted">Strategic guidance for your technology decisions</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+      <div class="card text-center h-100">
+        <div class="card-body">
+          <i class="bi bi-shield-check" style="font-size: 3rem; color: var(--accent-green);"></i>
+          <h3 class="h5 mt-3">Cybersecurity</h3>
+          <p class="text-muted">Protect your business with robust security solutions</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="text-center mt-5">
+    <a href="{% url 'services:catalog' %}" class="btn btn-outline-primary btn-lg">
+      Explore All Services
+    </a>
+  </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="container py-5">
+  <div class="text-center mb-5">
+    <h2 class="display-6 fw-bold">How It Works</h2>
+    <p class="lead text-muted">Simple and straightforward process</p>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-md-4">
+      <div class="text-center">
+        <div class="mb-3">
+          <span class="badge bg-primary" style="font-size: 2rem; padding: 1rem 1.5rem; border-radius: 50%;">1</span>
+        </div>
+        <h3 class="h5">Choose a Service</h3>
+        <p class="text-muted">Browse our catalog and select the service that fits your needs</p>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="text-center">
+        <div class="mb-3">
+          <span class="badge bg-primary" style="font-size: 2rem; padding: 1rem 1.5rem; border-radius: 50%;">2</span>
+        </div>
+        <h3 class="h5">Place Your Order</h3>
+        <p class="text-muted">Fill out a simple form with your requirements. No account needed!</p>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="text-center">
+        <div class="mb-3">
+          <span class="badge bg-primary" style="font-size: 2rem; padding: 1rem 1.5rem; border-radius: 50%;">3</span>
+        </div>
+        <h3 class="h5">We Deliver</h3>
+        <p class="text-muted">We'll build your solution and keep you updated every step of the way</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA Section -->
+<section class="container py-5">
+  <div class="card bg-gradient" style="background: linear-gradient(135deg, var(--darker-bg) 0%, var(--dark-bg) 100%); border-color: var(--primary);">
+    <div class="card-body text-center py-5">
+      <h2 class="display-6 fw-bold mb-3">Ready to Get Started?</h2>
+      <p class="lead text-muted mb-4">
+        Let's bring your ideas to life. Contact us today for a free consultation.
+      </p>
+      <a href="{% url 'contact' %}" class="btn btn-primary btn-lg px-5">
+        Contact Us Now
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}

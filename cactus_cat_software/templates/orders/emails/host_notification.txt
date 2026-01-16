@@ -1,0 +1,39 @@
+{{ site_name }} - New Order Received
+
+========================================
+
+ACTION REQUIRED: A new order has been placed and requires review.
+
+Order Information:
+------------------
+Order Number: {{ order.order_number }}
+Order Date: {{ order.created|date:"F d, Y \a\t g:i A" }}
+Status: {{ order.get_status_display }}
+
+Customer Information:
+---------------------
+Name: {{ order.customer_name }}
+Email: {{ order.customer_email }}
+Phone: {{ order.customer_phone|default:"Not provided" }}
+Company: {{ order.company_name|default:"Not provided" }}
+
+Order Items:
+------------
+{% if order.items.exists %}{% for item in order.items.all %}{{ item.quantity }}x {{ item.service_package.name }} - ${{ item.get_total_price }}
+{% endfor %}{% else %}1x {{ order.service_package.name }} - ${{ order.total_amount }}
+{% endif %}
+Total Amount: ${{ order.total_amount }}
+
+{% if order.custom_requirements %}Custom Requirements:
+--------------------
+{{ order.custom_requirements }}
+{% endif %}
+
+Next Steps:
+-----------
+1. Review the order details above
+2. Contact the customer to discuss project requirements
+3. Prepare and send a detailed quote
+4. Create a project dashboard once approved
+
+This is an automated notification from {{ site_name }}.

@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Order Complete{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row">
+    <div class="col-lg-6 mx-auto text-center">
+      <div class="mb-4">
+        <i class="bi bi-check-circle-fill" style="font-size: 5rem; color: var(--accent-green);"></i>
+      </div>
+
+      <h1 class="display-5 fw-bold mb-3">Thank You!</h1>
+      <p class="lead mb-4">Your order has been received successfully.</p>
+
+      <div class="card mb-4 text-start">
+        <div class="card-body">
+          <h2 class="h5 mb-3">Order Details</h2>
+          <dl class="row">
+            <dt class="col-sm-4">Order Number:</dt>
+            <dd class="col-sm-8"><strong>{{ order.order_number }}</strong></dd>
+
+            <dt class="col-sm-4">Status:</dt>
+            <dd class="col-sm-8">
+              <span class="badge bg-warning">{{ order.get_status_display }}</span>
+            </dd>
+          </dl>
+        </div>
+      </div>
+
+      <div class="card mb-4 text-start">
+        <div class="card-body">
+          <h2 class="h5 mb-3">Service Requested</h2>
+          {% if order.items.exists %}
+            {% for item in order.items.all %}
+              <div class="mb-4 {% if not forloop.last %}pb-3 border-bottom{% endif %}">
+                <h3 class="h4 mb-2">{{ item.service_package.name }}</h3>
+                <p class="mb-2">{{ item.service_package.short_description }}</p>
+                <p class="text-muted small mb-0">Estimated: ${{ item.get_total_price }}</p>
+              </div>
+            {% endfor %}
+            <div class="mt-3 pt-3 border-top">
+              <div class="d-flex justify-content-between">
+                <span class="text-muted">Estimated Total:</span>
+                <span class="text-muted">${{ order.total_amount }}</span>
+              </div>
+            </div>
+          {% else %}
+            <h3 class="h4 mb-2">{{ order.service_package.name }}</h3>
+            <p class="mb-2">{{ order.service_package.short_description }}</p>
+            <p class="text-muted small mb-0">Estimated: ${{ order.total_amount }}</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="alert alert-success">
+        <i class="bi bi-envelope-check"></i>
+        <strong>Confirmation email sent!</strong><br>
+        We've sent a confirmation email to <strong>{{ order.customer_email }}</strong>.
+        Please check your inbox (and spam folder).
+      </div>
+
+      <h3 class="h5 mb-3">What's Next?</h3>
+      <p class="text-muted">
+        Our team will review your order and reach out to you within 1-2 business days
+        to discuss the project details and next steps.
+      </p>
+
+      {% if order.user %}
+        <a href="{% url 'projects:dashboard' %}" class="btn btn-primary me-2">
+          View My Projects
+        </a>
+      {% endif %}
+      <a href="{% url 'services:catalog' %}" class="btn btn-outline-primary">
+        Browse More Services
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}
