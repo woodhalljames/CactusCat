@@ -7,29 +7,31 @@
 <!-- Hero Section -->
 <section class="hero">
   <div class="container">
-    <div class="row">
-      <div class="col-lg-8 mx-auto text-center">
-        <h1 class="display-3 fw-bold">
-          Building <span class="accent">Digital Solutions</span> for Tomorrow
-        </h1>
-        <p class="lead mb-4">
-          Professional web development, app development, and cybersecurity services
-          tailored to your business needs.
-        </p>
-        <div class="d-flex gap-3 justify-content-center flex-wrap">
-          <a href="{% url 'services:catalog' %}" class="btn btn-primary btn-lg px-5">
-            View Our Services
-          </a>
-          <a href="{% url 'contact' %}" class="btn btn-outline-primary btn-lg px-5">
-            Get in Touch
-          </a>
+    <div class="hero-content">
+      <div class="row">
+        <div class="col-lg-8 mx-auto text-center">
+          <h1 class="display-3 fw-bold">
+            Building <span class="accent">Software Solutions</span> with Goals in Mind.
+          </h1>
+          <p class="lead mb-4">
+            Professional web development, automation, digital marketing and cybersecurity services
+            tailored to your business and personal needs.
+          </p>
+          <div class="d-flex gap-3 justify-content-center flex-wrap">
+            <a href="{% url 'services:catalog' %}" class="btn btn-primary btn-lg px-5">
+              View Our Services
+            </a>
+            <a href="{% url 'contact' %}" class="btn btn-outline-primary btn-lg px-5">
+              Get in Touch
+            </a>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Featured Services Section -->
+<!-- Services Section -->
 <section class="container py-5">
   <div class="text-center mb-5">
     <h2 class="display-6 fw-bold">Our Services</h2>
@@ -41,8 +43,8 @@
       <div class="card text-center h-100">
         <div class="card-body">
           <i class="bi bi-code-slash" style="font-size: 3rem; color: var(--accent-green);"></i>
-          <h3 class="h5 mt-3">Web Development</h3>
-          <p class="text-muted">Custom websites and web applications built with modern technologies</p>
+          <h3 class="h5 mt-3">Software Development</h3>
+          <p class="text-muted">Custom applications and solutions built with technologies that scale.</p>
         </div>
       </div>
     </div>
@@ -50,9 +52,9 @@
     <div class="col-md-6 col-lg-3">
       <div class="card text-center h-100">
         <div class="card-body">
-          <i class="bi bi-phone" style="font-size: 3rem; color: var(--accent-green);"></i>
-          <h3 class="h5 mt-3">App Development</h3>
-          <p class="text-muted">Mobile and desktop applications that users love</p>
+          <i class="bi bi-clock" style="font-size: 3rem; color: var(--accent-green);"></i>
+          <h3 class="h5 mt-3">Automations</h3>
+          <p class="text-muted">Minimize vulnerabilities and maximize time savings with impactful business solutions.</p>
         </div>
       </div>
     </div>
@@ -60,9 +62,9 @@
     <div class="col-md-6 col-lg-3">
       <div class="card text-center h-100">
         <div class="card-body">
-          <i class="bi bi-gear" style="font-size: 3rem; color: var(--accent-green);"></i>
-          <h3 class="h5 mt-3">Tech Consulting</h3>
-          <p class="text-muted">Strategic guidance for your technology decisions</p>
+          <i class="bi bi-megaphone" style="font-size: 3rem; color: var(--accent-green);"></i>
+          <h3 class="h5 mt-3">Digital Marketing</h3>
+          <p class="text-muted">Strategic digital marketing solutions that grow your brand.</p>
         </div>
       </div>
     </div>
@@ -85,58 +87,321 @@
   </div>
 </section>
 
-<!-- How It Works Section -->
-<section class="container py-5">
-  <div class="text-center mb-5">
-    <h2 class="display-6 fw-bold">How It Works</h2>
-    <p class="lead text-muted">Simple and straightforward process</p>
-  </div>
-
-  <div class="row g-4">
-    <div class="col-md-4">
-      <div class="text-center">
-        <div class="mb-3">
-          <span class="badge bg-primary" style="font-size: 2rem; padding: 1rem 1.5rem; border-radius: 50%;">1</span>
-        </div>
-        <h3 class="h5">Choose a Service</h3>
-        <p class="text-muted">Browse our catalog and select the service that fits your needs</p>
+<!-- Development Section -->
+<section class="showcase-section">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6 order-lg-2 showcase-info">
+        <i class="bi bi-code-square" style="font-size: 4rem; color: var(--accent-green); margin-bottom: 1rem; display: block;"></i>
+        <h3>Custom Development, You Control</h3>
+        <p>
+          From full-stack web applications to business automations, we build solutions that work for your specific needs.
+          Every project includes management controls that allow you access to manage your system's specific details with or without a developer.
+        </p>
+        <ul class="list-unstyled mt-4">
+          <li class="mb-3"><i class="bi bi-check-circle text-success me-2"></i>Web Applications & Custom Websites</li>
+          <li class="mb-3"><i class="bi bi-check-circle text-success me-2"></i>Business & Email Automations</li>
+          <li class="mb-3"><i class="bi bi-check-circle text-success me-2"></i>Mobile App Development</li>
+          <li class="mb-3"><i class="bi bi-check-circle text-success me-2"></i>Data Scraping & Integration</li>
+        </ul>
+        <a href="{% url 'services:catalog' %}" class="btn btn-outline-primary mt-3">
+          Development Services
+        </a>
       </div>
-    </div>
-
-    <div class="col-md-4">
-      <div class="text-center">
-        <div class="mb-3">
-          <span class="badge bg-primary" style="font-size: 2rem; padding: 1rem 1.5rem; border-radius: 50%;">2</span>
+      <div class="col-lg-6 order-lg-1">
+        <div class="card p-4" style="background: linear-gradient(135deg, var(--darker-bg) 0%, var(--card-bg) 100%);">
+          <div class="row g-4">
+            <div class="col-6">
+              <div class="p-3">
+                <i class="bi bi-speedometer2" style="font-size: 2.5rem; color: var(--accent-green);"></i>
+                <h5 class="mt-2 mb-0">Collect Data</h5>
+                <small class="text-muted">Analytics & Reporting</small>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="p-3">
+                <i class="bi bi-gear-wide-connected" style="font-size: 2.5rem; color: var(--accent-green);"></i>
+                <h5 class="mt-2 mb-0">Admin Panels</h5>
+                <small class="text-muted">Edit & Update</small>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="p-3">
+                <i class="bi bi-sliders" style="font-size: 2.5rem; color: var(--accent-green);"></i>
+                <h5 class="mt-2 mb-0">Custom Options</h5>
+                <small class="text-muted">Tailor Made</small>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="p-3">
+                <i class="bi bi-clipboard-data" style="font-size: 2.5rem; color: var(--accent-green);"></i>
+                <h5 class="mt-2 mb-0">Productivity</h5>
+                <small class="text-muted">Reduce Error</small>
+              </div>
+            </div>
+          </div>
         </div>
-        <h3 class="h5">Place Your Order</h3>
-        <p class="text-muted">Fill out a simple form with your requirements. No account needed!</p>
-      </div>
-    </div>
-
-    <div class="col-md-4">
-      <div class="text-center">
-        <div class="mb-3">
-          <span class="badge bg-primary" style="font-size: 2rem; padding: 1rem 1.5rem; border-radius: 50%;">3</span>
-        </div>
-        <h3 class="h5">We Deliver</h3>
-        <p class="text-muted">We'll build your solution and keep you updated every step of the way</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- CTA Section -->
-<section class="container py-5">
-  <div class="card bg-gradient" style="background: linear-gradient(135deg, var(--darker-bg) 0%, var(--dark-bg) 100%); border-color: var(--primary);">
-    <div class="card-body text-center py-5">
-      <h2 class="display-6 fw-bold mb-3">Ready to Get Started?</h2>
-      <p class="lead text-muted mb-4">
-        Let's bring your ideas to life. Contact us today for a free consultation.
-      </p>
-      <a href="{% url 'contact' %}" class="btn btn-primary btn-lg px-5">
-        Contact Us Now
-      </a>
+<!-- Example Work Section 1 - Info Left, Preview Right >
+<section class="showcase-section">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="display-6 fw-bold"></h2>
+      <p class="lead text-muted">Projects delivering real results</p>
+    </div>
+
+    <!---div class="row align-items-center g-5">
+      <div class="col-lg-6 showcase-info">
+        <h3>DreamWedAI</h3>
+        <p>
+          A serene cabin rental website designed to showcase the natural beauty of the property
+          and streamline the booking experience. Features integrated calendar availability,
+          online reservations, and stunning imagery that captures the essence of a peaceful getaway.
+        </p>
+        <div class="tech-stack">
+          <span class="tech-badge">Django</span>
+          <span class="tech-badge">Python</span>
+          <span class="tech-badge">PostgreSQL</span>
+          <span class="tech-badge">Responsive Design</span>
+        </div>
+        <a href="https://stoneycreekcabin.com" target="_blank" rel="noopener" class="btn btn-outline-primary mt-4">
+          <i class="bi bi-box-arrow-up-right me-2"></i>Visit Site
+        </a>
+      </div>
+      <div class="col-lg-6">
+        <div class="showcase-preview">
+          <img src="{% static 'images/showcase-stoneycreek.png' %}" alt="Stoney Creek Cabin website screenshot" loading="lazy">
+        </div>
+      </div>
+    </div--->
+  </div>
+</section--->
+
+<!-- Example Work Section 2 - Preview Left, Info Right >
+<section class="showcase-section">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6 order-lg-2 showcase-info">
+        <h3>DreamWedAI</h3>
+        <p>
+          A comprehensive wedding visualization platform for engaged and married couples. Built with a focus on making professional wedding input accessible, the site features multiple image generation tools, intuitive UX and secure monthly subscription.
+        </p>
+        <div class="tech-stack">
+          <span class="tech-badge">Python</span>
+          <span class="tech-badge">SaaS</span>
+          <span class="tech-badge">AI Integration</span>
+          <span class="tech-badge">Marketing Suite</span>
+        </div>
+        <a href="https://dreamwedai.com" target="_blank" rel="noopener" class="btn btn-outline-primary mt-4">
+          <i class="bi bi-box-arrow-up-right me-2"></i>Visit Site
+        </a>
+      </div>
+      <div class="col-lg-6 order-lg-1">
+        <div class="showcase-preview">
+          <img src="{% static 'images/wedding_1.jpg' %}" alt="DreamWedAI website screenshot" loading="lazy">
+        </div>
+      </div>
+    </div>
+  </div>
+</section--->
+
+<!-- Marketing Section -->
+<section class="showcase-section">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6 showcase-info">
+        <i class="bi bi-graph-up-arrow" style="font-size: 4rem; color: var(--accent-green); margin-bottom: 1rem; display: block;"></i>
+        <h3>Digital Marketing That's Smart</h3>
+        <p>
+          Your online presence is more than just a website. We create comprehensive digital experiences
+          that connect your brand with your target audience from the purchase experience to discovery.
+        </p>
+        <ul class="list-unstyled mt-4">
+          <li class="mb-3"><i class="bi bi-check-circle text-success me-2"></i>Search Engine Optimization (SEO)</li>
+          <li class="mb-3"><i class="bi bi-check-circle text-success me-2"></i>Social Media Automation</li>
+          <li class="mb-3"><i class="bi bi-check-circle text-success me-2"></i>Content Strategy & Creation</li>
+          <li class="mb-3"><i class="bi bi-check-circle text-success me-2"></i>Analytics & Performance Tracking</li>
+        </ul>
+        <a href="{% url 'services:catalog' %}" class="btn btn-primary mt-3">
+          Marketing Services
+        </a>
+      </div>
+      <div class="col-lg-6 text-center">
+        <div class="card p-4" style="background: linear-gradient(135deg, var(--darker-bg) 0%, var(--card-bg) 100%);">
+          <div class="row g-4">
+            <div class="col-6">
+              <div class="p-3">
+                <i class="bi bi-search" style="font-size: 2.5rem; color: var(--accent-green);"></i>
+                <h5 class="mt-2 mb-0">SEO</h5>
+                <small class="text-muted">Rank Higher</small>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="p-3">
+                <i class="bi bi-share" style="font-size: 2.5rem; color: var(--accent-green);"></i>
+                <h5 class="mt-2 mb-0">Social</h5>
+                <small class="text-muted">Engage Users</small>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="p-3">
+                <i class="bi bi-bar-chart-line" style="font-size: 2.5rem; color: var(--accent-green);"></i>
+                <h5 class="mt-2 mb-0">Analytics</h5>
+                <small class="text-muted">Track Growth</small>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="p-3">
+                <i class="bi bi-pencil-square" style="font-size: 2.5rem; color: var(--accent-green);"></i>
+                <h5 class="mt-2 mb-0">Content</h5>
+                <small class="text-muted">Tell Stories</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
+
+<!-- Project Dashboard Section -->
+<section class="dashboard-preview-section">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6 order-lg-2">
+        <i class="bi bi-kanban" style="font-size: 4rem; color: var(--accent-green); margin-bottom: 1rem; display: block;"></i>
+        <h3 class="h2 mb-3">Your Personal Project Dashboard</h3>
+        <p class="text-muted mb-4">
+          When you work with us, you get more than just a final product. You get full visibility, input, and insight into
+          the development process through our custom project tracking system.
+        </p>
+        <h5 class="mb-3" style="color: var(--primary);">Dashboard Features:</h5>
+        <div class="row">
+          <div class="col-md-6">
+            <ul class="list-unstyled text-muted">
+              <li class="mb-2"><i class="bi bi-check-lg text-success me-2"></i>Real-time project status</li>
+              <li class="mb-2"><i class="bi bi-check-lg text-success me-2"></i>Timely Delivery</li>
+              <li class="mb-2"><i class="bi bi-check-lg text-success me-2"></i>Live preview access</li>
+            </ul>
+          </div>
+          <div class="col-md-6">
+            <ul class="list-unstyled text-muted">
+              <li class="mb-2"><i class="bi bi-check-lg text-success me-2"></i>Direct communication</li>
+              <li class="mb-2"><i class="bi bi-check-lg text-success me-2"></i>Document repository</li>
+              <li class="mb-2"><i class="bi bi-check-lg text-success me-2"></i>Approval workflows</li>
+            </ul>
+          </div>
+        </div>
+        <a href="{% url 'about' %}" class="btn btn-outline-primary mt-3">
+          Learn More About Our Process
+        </a>
+      </div>
+      <div class="col-lg-6 order-lg-1 text-center">
+        <div class="card p-4">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h5 class="mb-0">Project Progress</h5>
+              <span class="badge bg-primary">In Development</span>
+            </div>
+            <div class="progress mb-4" style="height: 20px;">
+              <div class="progress-bar bg-success" role="progressbar" style="width: 65%;" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100">65%</div>
+            </div>
+            <div class="text-start">
+              <div class="d-flex justify-content-between mb-2">
+                <span><i class="bi bi-check-circle text-success me-2"></i>Planning</span>
+                <span class="text-success">Complete</span>
+              </div>
+              <div class="d-flex justify-content-between mb-2">
+                <span><i class="bi bi-check-circle text-success me-2"></i>Design</span>
+                <span class="text-success">Complete</span>
+              </div>
+              <div class="d-flex justify-content-between mb-2">
+                <span><i class="bi bi-arrow-right-circle text-primary me-2"></i>Development</span>
+                <span class="text-primary">In Progress</span>
+              </div>
+              <div class="d-flex justify-content-between mb-2">
+                <span><i class="bi bi-circle text-muted me-2"></i>Testing</span>
+                <span class="text-muted">Pending</span>
+              </div>
+              <div class="d-flex justify-content-between">
+                <span><i class="bi bi-circle text-muted me-2"></i>Launch</span>
+                <span class="text-muted">Pending</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Cybersecurity Section -->
+<section class="showcase-section">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6 showcase-info">
+        <i class="bi bi-shield-lock" style="font-size: 4rem; color: var(--accent-green); margin-bottom: 1rem; display: block;"></i>
+        <h3>Cybersecurity</h3>
+        <p>
+          In today's digital landscape, security isn't optional, it's essential. We provide comprehensive
+          cybersecurity services to protect your business from threats, ensure compliance, and give you
+          peace of mind knowing your local and cloud systems are secure.
+        </p>
+        <ul class="list-unstyled mt-4">
+          <li class="mb-3"><i class="bi bi-check-circle text-success me-2"></i>Security Assessments & Penetration Testing</li>
+          <li class="mb-3"><i class="bi bi-check-circle text-success me-2"></i>Vulnerability Management</li>
+          <li class="mb-3"><i class="bi bi-check-circle text-success me-2"></i>Compliance Consulting (HIPAA, PCI-DSS, SOC 2)</li>
+          <li class="mb-3"><i class="bi bi-check-circle text-success me-2"></i>Security Awareness Training</li>
+        </ul>
+        <a href="{% url 'services:catalog' %}" class="btn btn-primary mt-3">
+          Security Services
+        </a>
+      </div>
+      <div class="col-lg-6 text-center">
+        <div class="card p-4" style="background: linear-gradient(135deg, var(--darker-bg) 0%, var(--card-bg) 100%);">
+          <div class="row g-4">
+            <div class="col-6">
+              <div class="p-3">
+                <i class="bi bi-bug" style="font-size: 2.5rem; color: var(--accent-green);"></i>
+                <h5 class="mt-2 mb-0">Pen Testing</h5>
+                <small class="text-muted">Find Weaknesses</small>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="p-3">
+                <i class="bi bi-file-earmark-lock" style="font-size: 2.5rem; color: var(--accent-green);"></i>
+                <h5 class="mt-2 mb-0">Compliance</h5>
+                <small class="text-muted">Stay Certified</small>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="p-3">
+                <i class="bi bi-eye" style="font-size: 2.5rem; color: var(--accent-green);"></i>
+                <h5 class="mt-2 mb-0">Monitoring</h5>
+                <small class="text-muted">24/7 Watch</small>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="p-3">
+                <i class="bi bi-person-badge" style="font-size: 2.5rem; color: var(--accent-green);"></i>
+                <h5 class="mt-2 mb-0">Training</h5>
+                <small class="text-muted">Educate Teams</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Contact -->
+<section class="container py-4 text-center"><br><br>
+  <p class="text-muted mb-0">We love to talk: <a href="mailto:hello@cactuscatsoftware.com">hello@cactuscatsoftware.com</a></p>
+</section>
+
 {% endblock %}

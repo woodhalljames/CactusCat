@@ -332,37 +332,38 @@ a:hover {
 
 /* Hero Section */
 .hero {
-  min-height: 780px;
   background-image: url('/static/images/hero_navbar.png');
-  background-size: cover;
-  background-position: center top;
+  background-size: 100% auto;
+  background-position: top center;
   background-repeat: no-repeat;
-  background-attachment: scroll;
   position: relative;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
   margin-top: -80px;
   padding-top: 80px;
-  padding-bottom: 2rem;
   width: 100%;
+  /* Force aspect ratio to show full image - adjust if your image has different dimensions */
+  min-height: calc(100vw * 0.5); /* Assumes ~2:1 aspect ratio image */
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  padding: 6rem 0 8rem;
 }
 
 .hero::before {
   content: "";
   position: absolute;
-  top: 0;
+  top: 90%;
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, rgba(15, 15, 30, 0.6) 0%, rgba(26, 26, 46, 0.5) 100%);
+  background: linear-gradient(180deg, transparent 0%, var(--dark-bg) 100%);
   z-index: 1;
 }
 
 .hero .container {
   position: relative;
   z-index: 2;
-  padding: 3rem 0;
 }
 
 .hero h1 {
@@ -381,6 +382,68 @@ a:hover {
   font-size: 1.25rem;
   color: var(--light-text);
   text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Showcase Sections */
+.showcase-section {
+  padding: 5rem 0;
+}
+
+.showcase-section:nth-child(even) {
+  background-color: var(--darker-bg);
+}
+
+.showcase-preview {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--border-color);
+}
+
+.showcase-preview img {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.showcase-preview:hover img {
+  transform: scale(1.02);
+}
+
+.showcase-info h3 {
+  color: var(--text-primary);
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.showcase-info p {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  line-height: 1.7;
+}
+
+.showcase-info .tech-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.showcase-info .tech-badge {
+  background-color: rgba(131, 163, 132, 0.15);
+  color: var(--primary);
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+/* Dashboard Preview Section */
+.dashboard-preview-section {
+  background: linear-gradient(135deg, var(--darker-bg) 0%, var(--dark-bg) 100%);
+  padding: 5rem 0;
 }
 
 /* Footer */
@@ -691,23 +754,23 @@ code {
 /* Responsive Adjustments */
 @media (max-width: 768px) {
   .hero {
-    min-height: 680px;
     margin-top: -70px;
     padding-top: 70px;
-    padding-bottom: 1.5rem;
+    background-size: cover;
     background-position: center top;
+    min-height: 500px;
   }
 
-  .hero .container {
-    padding: 2.5rem 0;
+  .hero-content {
+    padding: 4rem 0 6rem;
   }
 
   .hero h1 {
-    font-size: 2.5rem;
+    font-size: 2rem;
   }
 
   .hero p {
-    font-size: 1.1rem;
+    font-size: 1rem;
   }
 
   .service-card .price {
@@ -716,6 +779,41 @@ code {
 
   footer .container-fluid {
     padding: 0 1.5rem;
+  }
+
+  .showcase-section {
+    padding: 3rem 0;
+  }
+
+  .showcase-preview iframe {
+    height: 280px;
+  }
+
+  .showcase-info {
+    margin-top: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero {
+    min-height: 400px;
+  }
+
+  .hero-content {
+    padding: 3rem 0 4rem;
+  }
+
+  .hero h1 {
+    font-size: 1.75rem;
+  }
+
+  .hero p {
+    font-size: 0.95rem;
+  }
+
+  .hero .btn-lg {
+    padding: 0.6rem 1.5rem;
+    font-size: 0.9rem;
   }
 }
 

@@ -1,13 +1,21 @@
+import hashlib
+import hmac
 import json
-from django.utils import timezone
+import logging
 
+from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
+from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import DetailView, ListView
 
-from .models import Project, ProjectApproval, ProjectNote
+from .models import Project, ProjectApproval, ProjectDeployment, ProjectNote
+
+logger = logging.getLogger(__name__)
 
 
 class ProjectDashboardView(LoginRequiredMixin, ListView):
@@ -45,7 +53,7 @@ class ProjectDetailView(LoginRequiredMixin, DetailView):
     context_object_name = "project"
 
     def get_queryset(self):
-        return Project.objects.filter(client=self.request.user)
+        return Project.objects.filter(client=self.request.user).select_related("deployment")
 
 
 class AddProjectNoteView(LoginRequiredMixin, View):
@@ -174,3 +182,92 @@ class ApprovalActionView(LoginRequiredMixin, View):
                 {"success": False, "error": str(e)},
                 status=500
             )
+
+
+class PreviewRedirectView(View):
+    """
+    Public view that redirects clients to their live preview.
+    No authentication required - access is via unique token.
+    """
+
+    def get(self, request, token):
+        deployment = get_object_or_404(
+            ProjectDeployment.objects.select_related("project"),
+            preview_token=token,
+        )
+
+        if deployment.is_running():
+            # Redirect to the Traefik-routed preview path
+            preview_url = deployment.get_preview_url()
+            return redirect(preview_url)
+
+        # Container not running - show a friendly message
+        context = {
+            "deployment": deployment,
+            "project": deployment.project,
+        }
+        return render(request, "projects/preview_unavailable.html", context)
+
+
+@method_decorator(csrf_exempt, name="dispatch")
+class GitHubWebhookView(View):
+    """
+    Handle GitHub webhook push events to trigger auto-deploy.
+    Validates webhook signature and queues redeploy task.
+    """
+
+    def post(self, request, project_id):
+        try:
+            deployment = ProjectDeployment.objects.select_related("project").get(
+                project_id=project_id
+            )
+        except ProjectDeployment.DoesNotExist:
+            logger.warning(f"Webhook received for unknown project: {project_id}")
+            return HttpResponse("Project not found", status=404)
+
+        # Validate GitHub signature
+        signature = request.headers.get("X-Hub-Signature-256", "")
+        if not self._verify_signature(request.body, signature, deployment.webhook_secret):
+            logger.warning(f"Invalid webhook signature for project {project_id}")
+            return HttpResponse("Invalid signature", status=403)
+
+        # Parse the payload
+        try:
+            payload = json.loads(request.body)
+        except json.JSONDecodeError:
+            return HttpResponse("Invalid JSON", status=400)
+
+        # Check if this is a push event
+        event_type = request.headers.get("X-GitHub-Event", "")
+        if event_type != "push":
+            logger.info(f"Ignoring non-push event: {event_type}")
+            return HttpResponse("OK - ignored non-push event", status=200)
+
+        # Check if push is to the configured branch
+        ref = payload.get("ref", "")
+        branch = ref.replace("refs/heads/", "")
+
+        if branch != deployment.github_branch:
+            logger.info(f"Ignoring push to branch {branch}, configured: {deployment.github_branch}")
+            return HttpResponse(f"OK - ignored push to {branch}", status=200)
+
+        # Trigger redeploy
+        from .tasks import redeploy_from_webhook
+
+        redeploy_from_webhook.delay(deployment.id)
+
+        logger.info(f"Webhook triggered redeploy for {deployment.project.slug}")
+        return HttpResponse("Deployment queued", status=200)
+
+    def _verify_signature(self, payload, signature, secret):
+        """Verify the GitHub webhook signature."""
+        if not signature or not secret:
+            return False
+
+        expected = "sha256=" + hmac.new(
+            secret.encode("utf-8"),
+            payload,
+            hashlib.sha256,
+        ).hexdigest()
+
+        return hmac.compare_digest(signature, expected)

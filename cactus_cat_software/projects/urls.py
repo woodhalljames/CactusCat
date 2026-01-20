@@ -13,4 +13,15 @@ urlpatterns = [
         views.ApprovalActionView.as_view(),
         name="approval_action",
     ),
+    # Deployment endpoints
+    path(
+        "preview/<uuid:token>/",
+        views.PreviewRedirectView.as_view(),
+        name="preview",
+    ),
+    path(
+        "webhooks/github/<int:project_id>/",
+        views.GitHubWebhookView.as_view(),
+        name="github_webhook",
+    ),
 ]

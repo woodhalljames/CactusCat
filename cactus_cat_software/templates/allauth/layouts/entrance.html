@@ -11,6 +11,9 @@
 {% block body %}
   <div class="d-flex justify-content-center h-100 py-4">
     <div class="col-md-4 py-4 my-4 px-4">
+      <div class="text-end mb-3">
+        <a href="{% url 'home' %}" class="text-muted text-decoration-none small">Home <i class="bi bi-chevron-right"></i><i class="bi bi-chevron-right"></i></a>
+      </div>
       {% if messages %}
         {% for message in messages %}
           <div class="alert alert-dismissible {% if message.tags %}alert-{{ message.tags }}{% endif %}">
@@ -26,6 +29,13 @@
       {% endblock content %}
       {% block extra_body %}
       {% endblock extra_body %}
+      {% if request.resolver_match.url_name != 'account_login' and request.resolver_match.url_name != 'account_signup' %}
+      <div class="text-center mt-4">
+        <a href="{% url 'account_login' %}" class="btn btn-outline-primary">
+          <i class="bi bi-arrow-left"></i> Back to Sign In
+        </a>
+      </div>
+      {% endif %}
     </div>
   </div>
 {% endblock body %}

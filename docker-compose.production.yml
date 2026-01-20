@@ -2,10 +2,14 @@ volumes:
   production_postgres_data: {}
   production_postgres_data_backups: {}
   production_traefik: {}
-  
   production_redis_data: {}
-  
 
+networks:
+  traefik-public:
+    name: traefik-public
+    driver: bridge
+  default:
+    driver: bridge
 
 services:
   django: &django
@@ -42,10 +46,14 @@ services:
       - django
     volumes:
       - production_traefik:/etc/traefik/acme
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     ports:
       - '0.0.0.0:80:80'
       - '0.0.0.0:443:443'
       - '0.0.0.0:5555:5555'
+    networks:
+      - traefik-public
+      - default
 
   redis:
     image: docker.io/redis:7.2
@@ -57,6 +65,11 @@ services:
   celeryworker:
     <<: *django
     image: cactus_cat_software_production_celeryworker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock  # Docker SDK access for deployments
+    networks:
+      - traefik-public
+      - default
     command: /start-celeryworker
 
   celerybeat:

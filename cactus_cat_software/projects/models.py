@@ -1,3 +1,6 @@
+import secrets
+import uuid
+
 from django.conf import settings
 from django.db import models
 from django.urls import reverse
@@ -391,3 +394,137 @@ class ProjectApproval(TimeStampedModel):
 
     def is_rejected(self):
         return self.status == "rejected"
+
+
+class ProjectDeployment(TimeStampedModel):
+    """Docker deployment configuration for client project previews."""
+
+    STATUS_CHOICES = [
+        ("pending", _("Pending")),
+        ("cloning", _("Cloning Repository")),
+        ("building", _("Building Image")),
+        ("starting", _("Starting Container")),
+        ("running", _("Running")),
+        ("stopped", _("Stopped")),
+        ("failed", _("Failed")),
+    ]
+
+    project = models.OneToOneField(
+        Project,
+        on_delete=models.CASCADE,
+        related_name="deployment",
+        verbose_name=_("Project"),
+    )
+
+    # GitHub configuration
+    github_repo_url = models.URLField(
+        _("GitHub Repository URL"),
+        help_text="Full URL to the GitHub repository (e.g., https://github.com/user/repo)",
+    )
+    github_branch = models.CharField(
+        _("Branch"),
+        max_length=100,
+        default="main",
+        help_text="Branch to deploy (default: main)",
+    )
+    webhook_secret = models.CharField(
+        _("Webhook Secret"),
+        max_length=64,
+        blank=True,
+        help_text="Secret for validating GitHub webhook requests",
+    )
+
+    # Container configuration
+    container_id = models.CharField(
+        _("Container ID"),
+        max_length=64,
+        blank=True,
+        help_text="Docker container ID when running",
+    )
+    image_name = models.CharField(
+        _("Image Name"),
+        max_length=200,
+        blank=True,
+        help_text="Docker image name for this deployment",
+    )
+    internal_port = models.IntegerField(
+        _("Internal Port"),
+        default=8000,
+        help_text="Port the application listens on inside the container",
+    )
+
+    # Status
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="pending",
+    )
+    last_deployed_at = models.DateTimeField(
+        _("Last Deployed"),
+        null=True,
+        blank=True,
+    )
+    build_log = models.TextField(
+        _("Build Log"),
+        blank=True,
+        help_text="Output from the last build/deploy attempt",
+    )
+
+    # Public access
+    preview_token = models.UUIDField(
+        _("Preview Token"),
+        default=uuid.uuid4,
+        unique=True,
+        help_text="Token for public preview access",
+    )
+
+    # Resource limits
+    memory_limit = models.CharField(
+        _("Memory Limit"),
+        max_length=20,
+        default="256m",
+        help_text="Container memory limit (e.g., 256m, 512m)",
+    )
+    cpu_limit = models.FloatField(
+        _("CPU Limit"),
+        default=0.5,
+        help_text="CPU limit (0.5 = half a core)",
+    )
+
+    class Meta:
+        verbose_name = _("Project Deployment")
+        verbose_name_plural = _("Project Deployments")
+
+    def __str__(self):
+        return f"Deployment: {self.project.project_name} ({self.get_status_display()})"
+
+    def save(self, *args, **kwargs):
+        if not self.webhook_secret:
+            self.webhook_secret = secrets.token_hex(32)
+        if not self.image_name:
+            self.image_name = f"client-{self.project.slug}:latest"
+        super().save(*args, **kwargs)
+
+    def get_preview_url(self):
+        """Get the path-based preview URL."""
+        return f"/{self.project.slug}-preview/"
+
+    def get_preview_link(self):
+        """Get the full preview URL with token for clients."""
+        return reverse("projects:preview", kwargs={"token": self.preview_token})
+
+    def get_webhook_url(self):
+        """Get the webhook URL for GitHub."""
+        return reverse("projects:github_webhook", kwargs={"project_id": self.project.pk})
+
+    def is_running(self):
+        return self.status == "running"
+
+    def is_deploying(self):
+        return self.status in ("cloning", "building", "starting")
+
+    def can_deploy(self):
+        return self.status in ("pending", "stopped", "failed")
+
+    def can_stop(self):
+        return self.status == "running"
