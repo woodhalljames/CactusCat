@@ -12,7 +12,7 @@ networks:
 
 services:
   traefik:
-    image: traefik:v3.0
+    image: traefik:3.6
     container_name: cactus_cat_software_local_traefik
     command:
       - "--api.insecure=true"
