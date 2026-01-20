@@ -4,11 +4,45 @@
 <head>
   <meta charset="utf-8" />
   <meta http-equiv="x-ua-compatible" content="ie=edge" />
-  <title>{% block title %}Cactus Cat Software{% endblock title %}</title>
+  <title>{% block title %}Cactus Cat Software | Business Software Solutions{% endblock title %}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="{% block meta_description %}Professional web development, app development, and cybersecurity services{% endblock %}" />
-  <meta name="author" content="James Woodhall" />
+  <meta name="description" content="{% block meta_description %}Cactus Cat Software delivers custom web development, business automation, and cybersecurity solutions. Northeast-based, serving clients globally.{% endblock %}" />
+  <meta name="author" content="Cactus Cat Software" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="{% block canonical_url %}https://www.cactuscatsoftware.com{{ request.path }}{% endblock %}" />
   <link rel="icon" href="{% static 'images/favicons/favicon.ico' %}" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="{% block og_type %}website{% endblock %}" />
+  <meta property="og:url" content="https://www.cactuscatsoftware.com{{ request.path }}" />
+  <meta property="og:title" content="{% block og_title %}Cactus Cat Software | Business Software Solutions{% endblock %}" />
+  <meta property="og:description" content="{% block og_description %}Custom web development, business automation, and cybersecurity solutions. Northeast-based, serving clients globally.{% endblock %}" />
+  <meta property="og:image" content="{% block og_image %}{% static 'images/Cactus_Cat_Logo.png' %}{% endblock %}" />
+  <meta property="og:site_name" content="Cactus Cat Software" />
+  <meta property="og:locale" content="en_US" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="{% block twitter_title %}Cactus Cat Software | Business Software Solutions{% endblock %}" />
+  <meta name="twitter:description" content="{% block twitter_description %}Custom web development, business automation, and cybersecurity solutions. Northeast-based, serving clients globally.{% endblock %}" />
+  <meta name="twitter:image" content="{% block twitter_image %}{% static 'images/Cactus_Cat_Logo.png' %}{% endblock %}" />
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Cactus Cat Software",
+    "url": "https://www.cactuscatsoftware.com",
+    "logo": "https://www.cactuscatsoftware.com{% static 'images/Cactus_Cat_Logo.png' %}",
+    "description": "Custom web development, business automation, digital marketing, and cybersecurity solutions. Northeast-based software company serving clients globally.",
+    "email": "hello@cactuscatsoftware.com",
+    "areaServed": "Worldwide",
+    "serviceType": ["Web Development", "Business Automation", "Digital Marketing", "Cybersecurity"],
+    "sameAs": []
+  }
+  </script>
+  {% block structured_data %}{% endblock %}
 
   {% block css %}
     <!-- Google Fonts -->

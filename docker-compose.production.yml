@@ -1,6 +1,83 @@
 volumes:
   production_postgres_data: {}
   production_postgres_data_backups: {}
+  production_redis_data: {}
+
+networks:
+  traefik-public:
+    external: true  # Use dreamwedai's Traefik network
+  default:
+    driver: bridge
+
+services:
+  django: &django
+    build:
+      context: .
+      dockerfile: ./compose/production/django/Dockerfile
+    image: cactus_cat_software_production_django
+    depends_on:
+      - postgres
+      - redis
+    env_file:
+      - ./.envs/.production/.django
+      - ./.envs/.production/.postgres
+    command: /start
+    networks:
+      - traefik-public
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.cactuscat.rule=Host(`cactuscatsoftware.com`)"
+      - "traefik.http.routers.cactuscat.entrypoints=websecure"
+      - "traefik.http.routers.cactuscat.tls.certresolver=letsencrypt"
+      - "traefik.docker.network=traefik-public"
+
+  postgres:
+    build:
+      context: .
+      dockerfile: ./compose/production/postgres/Dockerfile
+    image: cactus_cat_software_production_postgres
+    volumes:
+      - production_postgres_data:/var/lib/postgresql/18/docker
+      - production_postgres_data_backups:/backups
+    env_file:
+      - ./.envs/.production/.postgres
+
+  redis:
+    image: docker.io/redis:7.2
+    volumes:
+      - production_redis_data:/data
+
+  celeryworker:
+    <<: *django
+    image: cactus_cat_software_production_celeryworker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - traefik-public
+      - default
+    command: /start-celeryworker
+
+  celerybeat:
+    <<: *django
+    image: cactus_cat_software_production_celerybeat
+    command: /start-celerybeat
+
+  flower:
+    <<: *django
+    image: cactus_cat_software_production_flower
+    command: /start-flower
+
+  awscli:
+    build:
+      context: .
+      dockerfile: ./compose/production/aws/Dockerfile
+    env_file:
+      - ./.envs/.production/.django
+    volumes:
+      - production_postgres_data_backups:/backups:zvolumes:
+  production_postgres_data: {}
+  production_postgres_data_backups: {}
   production_traefik: {}
   production_redis_data: {}
 
