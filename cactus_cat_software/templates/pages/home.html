@@ -1,409 +1,1188 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Cactus Cat Software | Business Software Solutions{% endblock %}
+{% block title %}Cactus Cat Software | Streamline Operations. Automate Workflows. Build Better Software.{% endblock %}
 
-{% block meta_description %}Northeast-based software company delivering custom web development, business automation, and cybersecurity solutions to clients worldwide. Get results-driven software built for your business.{% endblock %}
+{% block meta_description %}East Coast software studio delivering custom software, automation & AI systems, technical marketing, and infrastructure & cybersecurity. Fixed price, fixed timeline. Owned by you from day one.{% endblock %}
+
+{% block css %}
+  {{ block.super }}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,400&display=swap" rel="stylesheet">
+
+  <style>
+    html { background: #0a0c1a; overflow-x: hidden; }
+    body  { font-family: 'Space Grotesk', sans-serif; background: transparent !important; overflow-x: hidden; max-width: 100%; }
+
+    /* ── Starfield ─────────────────────────────────────────── */
+    #pageStars {
+      position: fixed; inset: 0;
+      width: 100vw; height: 100vh;
+      z-index: 0; pointer-events: none;
+    }
+
+    /* ── Hero ──────────────────────────────────────────────── */
+    .hero-v2 {
+      position: relative; overflow: hidden;
+      min-height: 100vh;
+      margin-top: -80px; padding-top: 80px;
+      z-index: 1;
+    }
+
+    .hero-bg {
+      position: absolute; inset: 0;
+      background-image: url('{% static "images/hero_navbar.png" %}');
+      background-size: cover; background-position: center top;
+      opacity: 0.55; z-index: 1;
+    }
+
+    .hero-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(180deg,
+        rgba(10,12,26,0.25) 0%,
+        rgba(10,12,26,0.55) 55%,
+        rgba(10,12,26,1) 100%);
+      z-index: 2;
+    }
+
+    .hero-inner {
+      position: relative; z-index: 3;
+      display: flex; min-height: 820px;
+    }
+
+    .hero-left {
+      flex: 1 1 60%;
+      padding: 100px 40px 80px 0;
+    }
+
+    .hero-eyebrow-row {
+      display: flex; align-items: center; gap: 18px;
+      margin-bottom: 28px;
+      opacity: 0; animation: hFadeUp 0.8s ease 0.2s forwards;
+    }
+
+    .hero-h1 {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(3.5rem, 7vw, 7.5rem);
+      font-weight: 700; line-height: 0.94;
+      letter-spacing: -0.03em; color: #f5f2ea;
+      margin: 0 0 52px;
+      opacity: 0; animation: hFadeUp 0.9s ease 0.4s forwards;
+    }
+
+    .hero-cycle-accent {
+      color: #83A384;
+      text-shadow: 0 0 12px rgba(131,163,132,0.35);
+    }
+
+    .hero-cycle-mask {
+      display: inline-block; overflow: hidden;
+      height: 1em; vertical-align: bottom; position: relative;
+    }
+
+    .hero-cycle-sizer {
+      display: inline-block; visibility: hidden;
+      white-space: nowrap; pointer-events: none;
+    }
+
+    .hero-cycle-word {
+      display: inline-block;
+      opacity: 0; transform: translateY(12px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+      position: absolute; left: 0; top: 0; white-space: nowrap;
+    }
+
+    .hero-cycle-word.active { opacity: 1; transform: translateY(0); }
+
+    .hero-brief-grid {
+      max-width: 560px;
+      opacity: 0; animation: hFadeUp 0.9s ease 0.7s forwards;
+    }
+
+    .hero-brief-label {
+      display: block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; letter-spacing: 0.28em;
+      text-transform: uppercase; color: #83A384;
+      margin-bottom: 10px;
+    }
+
+    .hero-brief-body {
+      font-family: 'Fraunces', serif;
+      font-size: 18px; color: rgba(245,242,234,0.78);
+      line-height: 1.65; margin: 0;
+    }
+
+    .hero-ctas {
+      display: flex; gap: 16px; flex-wrap: wrap;
+      margin-top: 48px;
+      opacity: 0; animation: hFadeUp 0.9s ease 0.9s forwards;
+    }
+
+    /* Right column: dispatch panel */
+    .hero-right {
+      flex: 0 0 420px;
+      padding: 100px 0 56px 24px;
+      display: flex; flex-direction: column; justify-content: center;
+    }
+
+    .hdp-inner {
+      position: relative;
+      border: 1px solid rgba(131,163,132,0.3);
+      padding: 24px 22px;
+      background: rgba(10,12,26,0.72);
+      backdrop-filter: blur(6px);
+    }
+
+    .hdp-header {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      margin-bottom: 18px;
+    }
+
+    .hdp-title {
+      font-family: 'Fraunces', serif;
+      font-size: 22px; font-weight: 600; color: #f5f2ea;
+      margin-top: 6px; letter-spacing: -0.01em;
+    }
+
+    .hdp-stats {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+      margin-bottom: 18px; padding: 14px 0;
+      border-top: 1px solid rgba(245,242,234,0.12);
+      border-bottom: 1px solid rgba(245,242,234,0.12);
+    }
+
+    .hdp-stat-val    { font-family:'Fraunces',serif; font-size:30px; font-weight:600; color:#83A384; line-height:1; }
+    .hdp-stat-val-sm { font-family:'Fraunces',serif; font-size:20px; font-weight:600; color:#f5f2ea;  line-height:1; }
+    .hdp-stat-val-warn { font-family:'Fraunces',serif; font-size:30px; font-weight:600; color:#e8b86d; line-height:1; }
+
+    .hdp-note {
+      margin-top: 14px; padding: 14px 12px;
+      background: rgba(131,163,132,0.06);
+      border: 1px dashed rgba(131,163,132,0.3);
+    }
+
+    .hdp-note-text {
+      font-family: 'Fraunces', serif; font-style: italic;
+      font-size: 16px; color: rgba(245,242,234,0.85);
+      line-height: 1.5; margin: 0;
+    }
+
+    .hdp-transmission {
+      margin-top: 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; color: rgba(245,242,234,0.4);
+      letter-spacing: 0.18em; text-align: right;
+    }
+
+    /* ── Discipline Overview ───────────────────────────────── */
+    .disciplines-overview {
+      padding: 96px 0 56px;
+      background: transparent;
+      position: relative; z-index: 1;
+    }
+
+    .disciplines-topo {
+      position: absolute; inset: 0; opacity: 0.08; pointer-events: none;
+      background-image:
+        radial-gradient(ellipse 600px 200px at 20% 30%, transparent 0%, transparent 30%, rgba(131,163,132,0.5) 31%, rgba(131,163,132,0.5) 32%, transparent 33%),
+        radial-gradient(ellipse 600px 200px at 20% 30%, transparent 0%, transparent 45%, rgba(131,163,132,0.5) 46%, rgba(131,163,132,0.5) 47%, transparent 48%),
+        radial-gradient(ellipse 800px 250px at 80% 70%, transparent 0%, transparent 30%, rgba(131,163,132,0.5) 31%, rgba(131,163,132,0.5) 32%, transparent 33%),
+        radial-gradient(ellipse 800px 250px at 80% 70%, transparent 0%, transparent 50%, rgba(131,163,132,0.5) 51%, rgba(131,163,132,0.5) 52%, transparent 53%);
+    }
+
+    .overview-header {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      margin-bottom: 56px; position: relative; z-index: 1;
+    }
+
+    .overview-nav {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
+      background: rgba(131,163,132,0.2);
+      position: relative; z-index: 1;
+    }
+
+    .overview-nav-item {
+      background: rgba(10,12,26,0.85);
+      padding: 28px 24px;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+
+    .overview-nav-item:hover { background: rgba(131,163,132,0.08); }
+
+    .overview-nav-num  { font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:0.25em; color:#83A384; margin-bottom:10px; }
+    .overview-nav-name { font-family:'Fraunces',serif; font-size:20px; font-weight:700; color:#f5f2ea; margin:0 0 8px; letter-spacing:-0.01em; }
+    .overview-nav-desc { font-family:'Fraunces',serif; font-size:14px; color:rgba(245,242,234,0.6); line-height:1.5; margin:0; }
+
+    /* ── Discipline Sections ───────────────────────────────── */
+    .discipline-section {
+      padding: 96px 0;
+      background: transparent;
+      position: relative; z-index: 1;
+      border-top: 1px solid rgba(131,163,132,0.2);
+    }
+
+    /* Alternating section tints */
+    #automation    { background: rgba(131,163,132,0.07); }
+    #infrastructure { background: rgba(131,163,132,0.07); }
+    .why-strip     { background: transparent; }
+    .faq-section   { background: rgba(131,163,132,0.06); }
+
+    .discipline-intro {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      margin-bottom: 56px;
+      align-items: stretch;
+    }
+
+    .discipline-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; letter-spacing: 0.3em;
+      text-transform: uppercase; color: #83A384;
+      display: block; margin-bottom: 16px;
+    }
+
+    .discipline-h2 {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(2.2rem, 4vw, 3.4rem);
+      font-weight: 700;
+      color: #f5f2ea;
+      letter-spacing: -0.02em;
+      line-height: 1.05;
+      margin: 0 0 20px;
+    }
+
+    .discipline-body {
+      font-family: 'Fraunces', serif;
+      font-size: 18px;
+      color: rgba(245,242,234,0.78);
+      line-height: 1.65;
+      margin: 0 0 24px;
+    }
+
+    .discipline-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 28px; }
+
+    .discipline-cta { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+
+    /* Right column in discipline intro */
+    .discipline-proof {
+      padding: 28px 24px;
+      border: 1px solid rgba(131,163,132,0.25);
+      background: rgba(10,12,26,0.5);
+    }
+
+    .discipline-proof-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+      color: #83A384; display: block; margin-bottom: 16px;
+    }
+
+    .discipline-stat-row {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(131,163,132,0.18);
+      margin-bottom: 18px;
+    }
+
+    .discipline-stat-val   { font-family:'Fraunces',serif; font-size:28px; font-weight:700; color:#83A384; line-height:1; }
+    .discipline-stat-label { font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:rgba(245,242,234,0.5); margin-top:5px; }
+
+    .discipline-deliverable {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px; color: rgba(245,242,234,0.65);
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 6px; letter-spacing: 0.06em;
+    }
+
+    .discipline-deliverable::before { content: '▸'; color: #83A384; flex-shrink: 0; }
+
+    #custom-software .discipline-deliverable {
+      font-size: 12px;
+      margin-bottom: 7px;
+      color: rgba(245,242,234,0.72);
+    }
+
+    #automation .discipline-deliverable {
+      font-size: 12px;
+      margin-bottom: 7px;
+      color: rgba(245,242,234,0.72);
+    }
+
+    /* ── §01 editorial layout ─────────────────────────────── */
+    .disc-editorial-head {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: end;
+      gap: 48px;
+      margin-bottom: 40px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid rgba(131,163,132,0.15);
+    }
+    .disc-editorial-stats {
+      display: flex; gap: 40px; flex-shrink: 0;
+    }
+    .disc-editorial-body {
+      display: grid;
+      grid-template-columns: 3fr 2fr;
+      gap: 64px;
+      align-items: stretch;
+    }
+
+    /* ── §02 reversed layout ──────────────────────────────── */
+    .discipline-intro--reversed {
+      grid-template-columns: 1fr 1fr;
+      direction: rtl;
+    }
+    .discipline-intro--reversed > * { direction: ltr; }
+
+    /* ── §03 stat-led layout ──────────────────────────────── */
+    .disc-stat-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: rgba(131,163,132,0.15);
+      margin-bottom: 48px;
+    }
+    .disc-stat-cell {
+      background: rgba(10,12,26,0.5);
+      padding: 28px 24px;
+    }
+    .disc-stat-big { font-family:'Fraunces',serif; font-size:clamp(2.5rem,5vw,4rem); font-weight:700; color:#83A384; line-height:1; margin-bottom:8px; }
+    .disc-stat-lbl { font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:0.2em; text-transform:uppercase; color:rgba(245,242,234,0.45); }
+    .disc-chips { display:flex; flex-wrap:wrap; gap:8px; margin-top:28px; }
+    .disc-chip {
+      font-family:'JetBrains Mono',monospace;
+      font-size:10px; letter-spacing:0.1em; text-transform:uppercase;
+      padding:5px 14px;
+      border:1px solid rgba(131,163,132,0.25);
+      color:rgba(245,242,234,0.6);
+    }
+    .disc-chip::before { content:'▸ '; color:#83A384; }
+
+    /* ── §04 compact centered layout ─────────────────────── */
+    .disc-compact {
+      max-width: 780px;
+    }
+    .disc-compact-stats {
+      display: flex; gap: 48px; margin-bottom: 40px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid rgba(131,163,132,0.15);
+    }
+    .disc-compact-stat-val { font-family:'Fraunces',serif; font-size:clamp(1.8rem,3.5vw,2.8rem); font-weight:700; color:#83A384; line-height:1; margin-bottom:6px; }
+    .disc-compact-stat-lbl { font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:0.16em; text-transform:uppercase; color:rgba(245,242,234,0.4); }
+
+    @media (max-width: 991px) {
+      .disc-editorial-head  { grid-template-columns: 1fr; }
+      .disc-editorial-stats { flex-wrap: wrap; gap: 24px; }
+      .disc-editorial-body  { grid-template-columns: 1fr; }
+      .discipline-intro     { grid-template-columns: 1fr; gap: 32px; }
+      .discipline-intro--reversed { direction: ltr; }
+      .disc-stat-strip      { grid-template-columns: 1fr; }
+      .disc-compact-stats   { flex-wrap: wrap; gap: 24px; }
+    }
+
+    /* Project cards grid */
+    .discipline-projects {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1px;
+      background: rgba(131,163,132,0.2);
+    }
+
+    .tm-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 56px;
+      align-items: start;
+    }
+
+    .tm-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      background: rgba(131,163,132,0.2);
+    }
+
+    @media (max-width: 991px) {
+      .tm-layout { grid-template-columns: 1fr; }
+    }
+
+    .dp-card {
+      background: rgba(10,12,26,0.88);
+      padding: 28px 24px;
+      position: relative;
+      transition: background 0.2s;
+    }
+
+    .dp-card:hover { background: rgba(131,163,132,0.06); }
+
+    .dp-card-eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px; letter-spacing: 0.22em;
+      text-transform: uppercase; color: #83A384;
+      margin-bottom: 12px; display: flex; align-items: center; gap: 10px;
+    }
+
+    .dp-card-name {
+      font-family: 'Fraunces', serif;
+      font-size: 22px; font-weight: 700;
+      color: #f5f2ea; margin: 0 0 10px;
+      letter-spacing: -0.01em;
+    }
+
+    .dp-card-desc {
+      font-family: 'Fraunces', serif;
+      font-size: 15px; color: rgba(245,242,234,0.68);
+      line-height: 1.55; margin: 0 0 18px;
+    }
+
+    .dp-card-result {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; color: rgba(131,163,132,0.9);
+      letter-spacing: 0.14em; padding: 8px 10px;
+      background: rgba(131,163,132,0.07);
+      border-left: 2px solid #83A384;
+    }
+
+    /* ── Expedition Log ────────────────────────────────────── */
+    .expedition { padding: 96px 0; background: transparent; position: relative; z-index: 1; border-top: 1px solid rgba(131,163,132,0.2); }
+
+    .expedition-header {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      margin-bottom: 48px;
+    }
+
+    .expedition-log {
+      display: grid; grid-template-columns: 100px 1fr; gap: 24px;
+    }
+
+    .exp-waypoint {
+      padding: 32px 0;
+      border-top: 1px solid rgba(131,163,132,0.3);
+      display: flex; flex-direction: column; align-items: flex-start;
+    }
+
+    .exp-num    { font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.28em; text-transform:uppercase; color:#83A384; margin-bottom:8px; }
+    .exp-date   { font-family:'Fraunces',serif; font-size:14px; color:rgba(245,242,234,0.55); }
+    .exp-vline  { width:1px; height:32px; background:rgba(131,163,132,0.3); margin:12px 0; }
+    .exp-status { font-family:'JetBrains Mono',monospace; font-size:10px; color:#83A384; letter-spacing:0.15em; }
+
+    .exp-article {
+      padding: 32px 0;
+      border-top: 1px solid rgba(131,163,132,0.3);
+      display: grid; grid-template-columns: 280px 1fr; gap: 40px; align-items: start;
+    }
+
+    .exp-placeholder {
+      aspect-ratio: 4/3; position: relative; overflow: hidden;
+    }
+
+    .exp-ph-label { position:absolute; top:10px; left:10px; font-family:'JetBrains Mono',monospace; font-size:9px; color:rgba(245,242,234,0.5); letter-spacing:0.18em; }
+    .exp-ph-num   { position:absolute; bottom:10px; right:10px; font-family:'JetBrains Mono',monospace; font-size:9px; color:rgba(245,242,234,0.5); letter-spacing:0.18em; }
+    .exp-ph-grid  { position:absolute; inset:0; background-image:linear-gradient(90deg,transparent 24px,rgba(0,0,0,0.1) 24px,rgba(0,0,0,0.1) 25px,transparent 25px),linear-gradient(0deg,transparent 24px,rgba(0,0,0,0.1) 24px,rgba(0,0,0,0.1) 25px,transparent 25px); background-size:25px 25px; }
+
+    .exp-tag-row { display:flex; align-items:center; gap:12px; margin-bottom:14px; }
+    .exp-name    { font-family:'Fraunces',serif; font-size:40px; font-weight:700; color:#f5f2ea; margin:0 0 10px; letter-spacing:-0.02em; }
+    .exp-blurb   { font-family:'Fraunces',serif; font-size:18px; color:rgba(245,242,234,0.78); line-height:1.6; margin-bottom:22px; max-width:480px; }
+
+    .exp-metrics {
+      display: flex; gap: 28px; padding: 14px 0;
+      border-top: 1px solid rgba(131,163,132,0.2);
+      border-bottom: 1px solid rgba(131,163,132,0.2);
+      margin-bottom: 16px;
+    }
+
+    .exp-metric-val   { font-family:'Fraunces',serif; font-size:26px; font-weight:600; color:#83A384; line-height:1; }
+    .exp-metric-label { font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:0.15em; text-transform:uppercase; color:rgba(245,242,234,0.55); margin-top:6px; }
+
+    .exp-stack     { display:flex; gap:6px; flex-wrap:wrap; }
+    .exp-stack-tag { font-family:'JetBrains Mono',monospace; font-size:9px; padding:2px 8px; border:1px solid rgba(245,242,234,0.18); color:rgba(245,242,234,0.7); letter-spacing:0.12em; }
+
+    /* ── Why Us strip ─────────────────────────────────────── */
+    .why-strip {
+      padding: 64px 0;
+      border-top: 1px solid rgba(131,163,132,0.2);
+      position: relative; z-index: 1;
+    }
+
+    .why-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
+      background: rgba(131,163,132,0.2);
+    }
+
+    .why-item {
+      background: rgba(10,12,26,0.85);
+      padding: 32px 28px;
+    }
+
+    .why-val   { font-family:'Fraunces',serif; font-size:clamp(2rem,4vw,3rem); font-weight:700; color:#83A384; line-height:1; margin-bottom:8px; }
+    .why-label { font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:rgba(245,242,234,0.5); margin-bottom:10px; }
+    .why-body  { font-family:'Fraunces',serif; font-size:15px; color:rgba(245,242,234,0.65); line-height:1.55; margin:0; }
+
+    /* ── FAQ + CTA ─────────────────────────────────────────── */
+    .faq-section {
+      padding: 96px 0;
+      background: transparent;
+      border-top: 1px solid rgba(245,242,234,0.18);
+      position: relative; z-index: 1;
+    }
+
+    .faq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; }
+
+    .cta-panel { position:relative; border:1px solid rgba(131,163,132,0.4); padding:48px; }
+    .cta-panel-title { font-family:'Fraunces',serif; font-size:clamp(3rem,5vw,4.25rem); font-weight:700; color:#f5f2ea; letter-spacing:-0.03em; line-height:0.94; margin-bottom:24px; }
+    .cta-panel-body  { font-family:'Fraunces',serif; font-size:20px; color:rgba(245,242,234,0.78); line-height:1.6; margin-bottom:36px; }
+    .cta-btn-stack   { display:flex; flex-direction:column; gap:14px; margin-bottom:32px; }
+    .cta-footer      { font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.1em; color:rgba(245,242,234,0.55); padding-top:24px; border-top:1px solid rgba(245,242,234,0.18); }
+
+    .cta-urgency {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; letter-spacing: 0.18em;
+      color: #e8b86d; margin-bottom: 20px;
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    .cta-urgency::before {
+      content: ''; display: inline-block;
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #e8b86d;
+      animation: blink 1.4s ease infinite;
+    }
+
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    /* ── Footer transparent for starfield ─────────────────── */
+    footer {
+      background: transparent !important;
+      position: relative; z-index: 1;
+    }
+
+    /* ── Animations ────────────────────────────────────────── */
+    @keyframes hFadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Responsive ────────────────────────────────────────── */
+    @media (max-width: 1100px) {
+      .hero-right { flex: 0 0 340px; }
+      .overview-nav { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 991px) {
+      .hero-inner    { flex-direction: column; min-height: auto; }
+      .hero-left     { padding: 80px 0 32px; }
+      .hero-right    { flex: none; padding: 0 0 60px; }
+      .faq-grid      { grid-template-columns: 1fr; }
+      .exp-article   { grid-template-columns: 1fr; }
+      .overview-header { flex-direction: column; gap: 24px; align-items: flex-start; }
+      .discipline-intro { grid-template-columns: 1fr; gap: 40px; }
+      .discipline-projects { grid-template-columns: 1fr; }
+      .discipline-stat-row { grid-template-columns: repeat(3, 1fr); }
+      .why-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      .hero-h1          { font-size: clamp(2rem, 8vw, 2.8rem); overflow-wrap: break-word; }
+      .hero-cycle-mask  { display: block; width: 100%; height: 1.15em; }
+      .hero-cycle-sizer { display: none; }
+      .hero-cycle-word  { white-space: normal; }
+      .hero-left        { overflow: hidden; }
+      .expedition-log   { grid-template-columns: 80px 1fr; }
+      .overview-nav     { grid-template-columns: 1fr; }
+      .why-grid         { grid-template-columns: 1fr; }
+      .discipline-projects { grid-template-columns: 1fr; }
+
+      /* Tighten card padding so nothing bleeds past viewport */
+      .dp-card          { padding: 20px 16px; }
+      .why-item         { padding: 22px 18px; }
+      .cta-panel        { padding: 28px 20px; }
+      .discipline-proof { padding: 18px 14px !important; }
+      .disc-stat-cell   { padding: 20px 16px; }
+      .hdp-inner        { padding: 20px 16px; }
+
+      /* Stat rows wrap gracefully */
+      .discipline-stat-row { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+      .disc-editorial-stats { gap: 16px; }
+
+      /* FAQ panel */
+      .faq-grid         { gap: 40px; }
+      .cta-panel-title  { font-size: clamp(2rem, 8vw, 3rem); }
+    }
+
+    @media (max-width: 480px) {
+      .discipline-stat-row { grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+      .discipline-stat-val  { font-size: 22px; }
+      .dp-card              { padding: 16px 14px; }
+      .why-item             { padding: 18px 14px; }
+      .cta-panel            { padding: 22px 16px; }
+      .disc-stat-big        { font-size: clamp(2rem, 8vw, 3rem); }
+      .disc-chips           { gap: 6px; }
+      .disc-chip            { font-size: 9px; padding: 4px 10px; }
+      .overview-nav-item    { padding: 20px 16px; }
+    }
+  </style>
+{% endblock css %}
 
 {% block content %}
-<!-- Hero Section -->
-<section class="hero">
+
+<canvas id="pageStars"></canvas>
+
+<!-- ═══════════════════════════════════════════════════════════
+     HERO
+════════════════════════════════════════════════════════════ -->
+<section class="hero-v2">
+  <div class="hero-bg"></div>
+  <div class="hero-overlay"></div>
+
   <div class="container">
-    <div class="hero-content">
-      <div class="row">
-        <div class="col-lg-8 mx-auto text-center">
-          <h1 class="display-3 fw-bold">
-            Building <span class="accent">Business Software</span> That Delivers Results.
-          </h1>
-          <p class="lead mb-4">
-            Northeast-based software company serving clients globally. Custom web development, automation,
-            and cybersecurity solutions tailored to your business goals.
-          </p>
-          <div class="d-flex gap-3 justify-content-center flex-wrap">
-            <a href="{% url 'services:catalog' %}" class="btn btn-primary btn-lg px-5">
-              View Our Services
+    <div class="hero-inner">
+
+      <div class="hero-left">
+
+        <div class="hero-eyebrow-row">
+          <span class="ds-eyebrow" style="margin:0;">·· Dispatch №042</span>
+          <span style="width:40px;height:1px;background:#83A384;display:inline-block;flex-shrink:0;"></span>
+          <span class="ds-coord">41°N · 73°W · ELEV 64m</span>
+        </div>
+
+        <h1 class="hero-h1">
+          Software<br>
+          built to<br>
+          <span class="hero-cycle-accent">
+            <span class="hero-cycle-mask">
+              <span class="hero-cycle-sizer" aria-hidden="true">streamline operations.</span>
+              <span class="hero-cycle-word active" id="cw0">streamline operations.</span>
+              <span class="hero-cycle-word"        id="cw1">automate the work.</span>
+              <span class="hero-cycle-word"        id="cw2">scale without hiring.</span>
+              <span class="hero-cycle-word"        id="cw3">work without you.</span>
+            </span>
+          </span>
+        </h1>
+
+        <div class="hero-brief-grid">
+          <div>
+            <span class="hero-brief-label">· Brief</span>
+            <p class="hero-brief-body">A global development studio built around <strong style="color:#f5f2ea;">transparency and communication</strong> with every build. We focus on custom software, automation, digital marketing, &amp; cybersecurity. Owned by you from day one, documented in language you understand, and smart enough to run on its own.</p>
+          </div>
+        </div>
+
+        <div class="hero-ctas">
+          <a href="{% url 'contact' %}" class="ds-btn-solid">Start a project →</a>
+          <a href="{% url 'services:catalog' %}" class="ds-btn">View Services</a>
+        </div>
+
+      </div><!-- /hero-left -->
+
+      <!-- Right: disciplines + blurb -->
+      <div class="hero-right">
+        <div class="hdp-inner" style="padding:0;">
+          <span class="ds-corner ds-corner-tl"></span>
+          <span class="ds-corner ds-corner-tr"></span>
+          <span class="ds-corner ds-corner-bl"></span>
+          <span class="ds-corner ds-corner-br"></span>
+
+          <!-- Four discipline cards -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(131,163,132,0.2);">
+            <a href="#custom-software" class="overview-nav-item" style="background:rgba(10,12,26,0.88);">
+              <div class="overview-nav-num">§ 01</div>
+              <div class="overview-nav-name">Custom Software</div>
+              <p class="overview-nav-desc">Web apps, SaaS platforms, portals, and internal tools built on a stack you own outright.</p>
             </a>
-            <a href="{% url 'contact' %}" class="btn btn-outline-primary btn-lg px-5">
-              Get in Touch
+            <a href="#automation" class="overview-nav-item" style="background:rgba(10,12,26,0.88);">
+              <div class="overview-nav-num">§ 02</div>
+              <div class="overview-nav-name">Automation &amp; AI</div>
+              <p class="overview-nav-desc">Workflow automation, AI integrations, and custom scripts that eliminate manual work for good.</p>
+            </a>
+            <a href="#technical-marketing" class="overview-nav-item" style="background:rgba(10,12,26,0.88);">
+              <div class="overview-nav-num">§ 03</div>
+              <div class="overview-nav-name">Technical Marketing</div>
+              <p class="overview-nav-desc">The technical foundation behind scalable marketing: SEO, funnels, analytics, and lead gen systems.</p>
+            </a>
+            <a href="#infrastructure" class="overview-nav-item" style="background:rgba(10,12,26,0.88);">
+              <div class="overview-nav-num">§ 04</div>
+              <div class="overview-nav-name">Infrastructure &amp; Cybersecurity</div>
+              <p class="overview-nav-desc">Hosting, DevOps, maintenance, and monitoring that keep your systems running smoothly long-term.</p>
             </a>
           </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
 
-<!-- Services Section -->
-<section class="container py-5">
-  <div class="text-center mb-5">
-    <h2 class="display-6 fw-bold">Our Services</h2>
-    <p class="lead text-muted">What we can build for you</p>
-  </div>
-
-  <div class="row g-4">
-    <div class="col-md-6 col-lg-3">
-      <div class="card text-center h-100">
-        <div class="card-body">
-          <i class="bi bi-code-slash" style="font-size: 3rem; color: var(--accent-green);"></i>
-          <h3 class="h5 mt-3">Software Development</h3>
-          <p class="text-muted">Custom applications and solutions built with technologies that scale.</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-md-6 col-lg-3">
-      <div class="card text-center h-100">
-        <div class="card-body">
-          <i class="bi bi-clock" style="font-size: 3rem; color: var(--accent-green);"></i>
-          <h3 class="h5 mt-3">Automations</h3>
-          <p class="text-muted">Minimize vulnerabilities and maximize time savings with impactful business solutions.</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-md-6 col-lg-3">
-      <div class="card text-center h-100">
-        <div class="card-body">
-          <i class="bi bi-megaphone" style="font-size: 3rem; color: var(--accent-green);"></i>
-          <h3 class="h5 mt-3">Digital Marketing</h3>
-          <p class="text-muted">Strategic digital marketing solutions that grow your brand.</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-md-6 col-lg-3">
-      <div class="card text-center h-100">
-        <div class="card-body">
-          <i class="bi bi-shield-check" style="font-size: 3rem; color: var(--accent-green);"></i>
-          <h3 class="h5 mt-3">Cybersecurity</h3>
-          <p class="text-muted">Protect your business with robust security solutions</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="text-center mt-5">
-    <a href="{% url 'services:catalog' %}" class="btn btn-outline-primary btn-lg">
-      Explore All Services
-    </a>
-  </div>
-</section>
-
-<!-- Development Section -->
-<section class="showcase-section">
-  <div class="container">
-    <div class="row align-items-center g-5">
-      <div class="col-lg-6 order-lg-2 showcase-info">
-        <i class="bi bi-code-square" style="font-size: 4rem; color: var(--accent-green); margin-bottom: 1rem; display: block;"></i>
-        <h3>Custom Development, You Control</h3>
-        <p>
-          From full-stack web applications to business automations, we build solutions that work for your specific needs.
-          Every project includes management controls that allow you access to manage your system's specific details with or without a developer.
-        </p>
-        <ul class="list-unstyled mt-4">
-          <li class="mb-3"><i class="bi bi-check-circle text-success me-2"></i>Web Applications & Custom Websites</li>
-          <li class="mb-3"><i class="bi bi-check-circle text-success me-2"></i>Business & Email Automations</li>
-          <li class="mb-3"><i class="bi bi-check-circle text-success me-2"></i>Mobile App Development</li>
-          <li class="mb-3"><i class="bi bi-check-circle text-success me-2"></i>Data Scraping & Integration</li>
-        </ul>
-        <a href="{% url 'services:catalog' %}" class="btn btn-outline-primary mt-3">
-          Development Services
-        </a>
-      </div>
-      <div class="col-lg-6 order-lg-1">
-        <div class="card p-4" style="background: linear-gradient(135deg, var(--darker-bg) 0%, var(--card-bg) 100%);">
-          <div class="row g-4">
-            <div class="col-6">
-              <div class="p-3">
-                <i class="bi bi-speedometer2" style="font-size: 2.5rem; color: var(--accent-green);"></i>
-                <h5 class="mt-2 mb-0">Collect Data</h5>
-                <small class="text-muted">Analytics & Reporting</small>
-              </div>
-            </div>
-            <div class="col-6">
-              <div class="p-3">
-                <i class="bi bi-gear-wide-connected" style="font-size: 2.5rem; color: var(--accent-green);"></i>
-                <h5 class="mt-2 mb-0">Admin Panels</h5>
-                <small class="text-muted">Edit & Update</small>
-              </div>
-            </div>
-            <div class="col-6">
-              <div class="p-3">
-                <i class="bi bi-sliders" style="font-size: 2.5rem; color: var(--accent-green);"></i>
-                <h5 class="mt-2 mb-0">Custom Options</h5>
-                <small class="text-muted">Tailor Made</small>
-              </div>
-            </div>
-            <div class="col-6">
-              <div class="p-3">
-                <i class="bi bi-clipboard-data" style="font-size: 2.5rem; color: var(--accent-green);"></i>
-                <h5 class="mt-2 mb-0">Productivity</h5>
-                <small class="text-muted">Reduce Error</small>
-              </div>
-            </div>
+          <!-- Blurb -->
+          <div style="padding:20px 22px;border-top:1px solid rgba(131,163,132,0.2);background:rgba(10,12,26,0.88);">
+            <p class="ds-body" style="font-size:14px;margin:0 0 12px;">We sell websites, apps, and automations that convert to efficiency, scalability, automation, and operational leverage. Fixed price, fixed timeline, and owned outright by you.</p>
+            <a href="{% url 'services:catalog' %}" class="ds-link" style="font-size:13px;">See all services →</a>
           </div>
         </div>
+      </div><!-- /hero-right -->
+
+    </div><!-- /hero-inner -->
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     MARQUEE STATS
+════════════════════════════════════════════════════════════ -->
+<section class="marquee-strip">
+  <div class="marquee-inner">
+    <span><span class="marquee-val">10 days</span>Conception To Project Start<span class="marquee-sep">◆</span></span>
+    <span><span class="marquee-val">3 wks</span>Avg. time to complete custom project<span class="marquee-sep">◆</span></span>
+    <span><span class="marquee-val">100+</span>APIs integrated<span class="marquee-sep">◆</span></span>
+    <span aria-hidden="true"><span class="marquee-val">10 days</span>Conception To Project Start<span class="marquee-sep">◆</span></span>
+    <span aria-hidden="true"><span class="marquee-val">3 wks</span>Avg. time to complete custom project<span class="marquee-sep">◆</span></span>
+    <span aria-hidden="true"><span class="marquee-val">100+</span>APIs integrated<span class="marquee-sep">◆</span></span>
+  </div>
+</section>
+
+
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     § 01 · CUSTOM SOFTWARE DEVELOPMENT — editorial
+════════════════════════════════════════════════════════════ -->
+<section class="discipline-section" id="custom-software">
+  <div class="container">
+
+    <!-- Full-width head row: heading left, stats right -->
+    <div class="disc-editorial-head ds-reveal">
+      <div>
+        <span class="discipline-num">§ 01 · Custom Software Development</span>
+        <h2 class="discipline-h2" style="margin:0;">Your exact workflow.<br>Built from scratch.</h2>
       </div>
+      <div class="disc-editorial-stats">
+        <div>
+          <div class="discipline-stat-val">6–16</div>
+          <div class="discipline-stat-label">Week build</div>
+        </div>
+        <div>
+          <div class="discipline-stat-val">100%</div>
+          <div class="discipline-stat-label">Code ownership</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Two-col body: text left, deliverables right -->
+    <div class="disc-editorial-body ds-reveal ds-reveal-d1">
+      <div>
+        <p class="discipline-body">Off-the-shelf software makes you adapt to it. We flip that. Every web app, SaaS platform, customer portal, and internal tool is engineered around how your business actually operates, then handed over with full source code, documentation, and no lock-in.</p>
+        <div class="discipline-tags">
+          <span class="atlas-tag">Web applications</span>
+          <span class="atlas-tag">SaaS platforms</span>
+          <span class="atlas-tag">Customer portals</span>
+          <span class="atlas-tag">Internal tools</span>
+          <span class="atlas-tag">API development</span>
+          <span class="atlas-tag">Admin dashboards</span>
+        </div>
+        <div class="discipline-cta" style="margin-top:28px;">
+          <a href="{% url 'contact' %}" class="ds-btn-solid">Start a project →</a>
+          <a href="{% url 'services:catalog' %}" class="ds-link">Software services →</a>
+        </div>
+      </div>
+      <div class="discipline-proof" style="display:flex;flex-direction:column;justify-content:space-between;padding:20px 18px;">
+        <div>
+          <span class="discipline-proof-label">· What's included</span>
+          <div class="discipline-deliverable">Safe & secure tech stack</div>
+          <div class="discipline-deliverable">Full source repo transferred on day 1</div>
+          <div class="discipline-deliverable">Stripe billing &amp; multi-role auth included for SaaS</div>
+          <div class="discipline-deliverable">Plain-English technical documentation</div>
+          <div class="discipline-deliverable">Two weeks of post-launch support included</div>
+          <div class="discipline-deliverable">Hosted on infrastructure you control</div>
+        </div>
+        <div style="margin-top:24px;padding-top:20px;border-top:1px solid rgba(131,163,132,0.18);">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(245,242,234,0.35);">· No vendor lock-in · No monthly licence fees · Source is yours from day one</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     § 02 · AUTOMATION & AI SYSTEMS — reversed + project cards
+════════════════════════════════════════════════════════════ -->
+<section class="discipline-section" id="automation">
+  <div class="container">
+
+    <div class="discipline-intro discipline-intro--reversed ds-reveal">
+      <div>
+        <span class="discipline-num">§ 02 · Automation &amp; AI Systems</span>
+        <h2 class="discipline-h2">Stop doing it manually.<br>Remove error.</h2>
+        <p class="discipline-body">If your team is copy-pasting between apps, exporting CSVs, or running the same report every Monday morning, that's time evaporating. We build the automations, AI integrations, and custom web portals that eliminate repetitive work permanently.</p>
+        <div class="discipline-cta">
+          <a href="{% url 'contact' %}" class="ds-btn-solid">Automate something →</a>
+          <a href="{% url 'services:catalog' %}" class="ds-link">Automation services →</a>
+        </div>
+      </div>
+
+      <div>
+        <div class="discipline-proof ds-reveal ds-reveal-d1" style="display:inline-block;width:100%;padding:20px 18px;">
+          <span class="discipline-proof-label">· Typical outcomes</span>
+          <div class="discipline-stat-row">
+            <div>
+              <div class="discipline-stat-val">1–3</div>
+              <div class="discipline-stat-label">Week turnaround</div>
+            </div>
+            <div>
+              <div class="discipline-stat-val">4+</div>
+              <div class="discipline-stat-label">Hrs/wk saved</div>
+            </div>
+            <div>
+              <div class="discipline-stat-val">Day 30</div>
+              <div class="discipline-stat-label">ROI visible</div>
+            </div>
+          </div>
+          <div class="discipline-deliverable">Platform-to-platform sync (Stripe, HubSpot, QB, Slack…)</div>
+          <div class="discipline-deliverable">AI-powered workflows and document processing</div>
+          <div class="discipline-deliverable">Scheduled jobs with error alerting built in</div>
+          <div class="discipline-deliverable">Auto-generated reports delivered on your schedule</div>
+          <div class="discipline-deliverable">Full documentation so your team can maintain it</div>
+        </div>
+        <div class="discipline-tags" style="margin-top:16px;">
+          <span class="atlas-tag">Workflow automation</span>
+          <span class="atlas-tag">AI integrations</span>
+          <span class="atlas-tag">CRM automation</span>
+          <span class="atlas-tag">Data sync &amp; pipelines</span>
+          <span class="atlas-tag">Reporting systems</span>
+          <span class="atlas-tag">Third-party integrations</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="discipline-projects ds-reveal ds-reveal-d2">
+      <div class="dp-card">
+        <div class="dp-card-eyebrow">Finance · Sync Script <span style="width:20px;height:1px;background:rgba(131,163,132,0.4);display:inline-block;"></span> SHIPPED ✓</div>
+        <div class="dp-card-name">InvoiceSync</div>
+        <p class="dp-card-desc">Nightly Stripe → QuickBooks reconciliation script for a SaaS company. Matches charges to invoices, flags discrepancies, and posts a Slack summary each morning.</p>
+        <div class="dp-card-result">▸ 14 hrs/week recovered · zero missed reconciliations</div>
+      </div>
+      <div class="dp-card">
+        <div class="dp-card-eyebrow">Sales Ops · CRM Pipeline <span style="width:20px;height:1px;background:rgba(131,163,132,0.4);display:inline-block;"></span> SHIPPED ✓</div>
+        <div class="dp-card-name">Lead Pipeline</div>
+        <p class="dp-card-desc">HubSpot CRM to internal data warehouse sync with deduplication, enrichment via Clearbit, and a clean daily snapshot for the sales team. Fully automated.</p>
+        <div class="dp-card-result">▸ Zero manual exports · Contacts synced daily · &lt; 2 min latency</div>
+      </div>
+      <div class="dp-card">
+        <div class="dp-card-eyebrow">Operations · Reporting <span style="width:20px;height:1px;background:rgba(131,163,132,0.4);display:inline-block;"></span> SHIPPED ✓</div>
+        <div class="dp-card-name">AutoReport</div>
+        <p class="dp-card-desc">Weekly PDF performance reports auto-compiled from five data sources and emailed to stakeholders every Monday at 7 AM.</p>
+        <div class="dp-card-result">▸ Replaces 2-hr manual process · 52 reports delivered per year, hands-free</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     § 03 · TECHNICAL MARKETING & GROWTH — stat-led
+════════════════════════════════════════════════════════════ -->
+<section class="discipline-section" id="technical-marketing">
+  <div class="container">
+    <div class="tm-layout">
+
+      <!-- Left: section content -->
+      <div>
+        <span class="discipline-num ds-reveal">§ 03 · Technical Marketing &amp; Growth</span>
+        <h2 class="discipline-h2 ds-reveal">The technical foundation<br>behind scalable growth.</h2>
+
+        <div class="ds-reveal ds-reveal-d1" style="margin-bottom:32px;">
+          <p class="discipline-body" style="margin-bottom:0;">A great product hard to discover earns nothing. We build the technical infrastructure behind scalable marketing infrastructure: SEO foundations, analytics systems, funnel architecture, and lead generation pipelines that turn visitors into revenue. Discovery to conversion, handled in one motion.</p>
+        </div>
+
+        <!-- Deliverables as chips -->
+        <div class="disc-chips ds-reveal ds-reveal-d2" style="margin-bottom:32px;">
+          <span class="disc-chip">Technical SEO audit &amp; implementation</span>
+          <span class="disc-chip">Conversion-optimised landing pages</span>
+          <span class="disc-chip">Analytics &amp; tracking infrastructure</span>
+          <span class="disc-chip">Email nurture sequences</span>
+          <span class="disc-chip">Automated social publishing</span>
+          <span class="disc-chip">Funnel systems</span>
+        </div>
+
+        <div class="discipline-cta ds-reveal ds-reveal-d3">
+          <a href="{% url 'contact' %}" class="ds-btn-solid">Build my growth system →</a>
+          <a href="{% url 'services:catalog' %}" class="ds-link">Marketing services →</a>
+        </div>
+      </div>
+
+      <!-- Right: stacked sample cards -->
+      <div class="tm-cards ds-reveal ds-reveal-d1">
+        <div class="dp-card">
+          <div class="dp-card-eyebrow">
+            Smart Home · Full-Stack Web Solution
+            <span style="width:20px;height:1px;background:rgba(131,163,132,0.4);display:inline-block;"></span>
+            SHIPPED ✓
+          </div>
+          <div class="dp-card-name"><a href="https://www.listenhearsmarthomes.com" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;">ListenHear Smart Homes ↗</a></div>
+          <p class="dp-card-desc">Full lifecycle marketing campaign built alongside a dual B2C/B2B platform. Built a showroom for new property builds and a project tracker for use with partner builders; turning every major install into a seamless experience, while protecting the business with central dashboard for communicating and phase tracking.</p>
+          <div class="dp-card-result">▸ Automated outreach for both B2C and B2B · New-home project management</div>
+        </div>
+        <div class="dp-card">
+          <div class="dp-card-eyebrow">
+            B2B Commerce · Cross-Border Sourcing Platform
+            <span style="width:20px;height:1px;background:rgba(131,163,132,0.4);display:inline-block;"></span>
+            SHIPPED ✓
+          </div>
+          <div class="dp-card-name"><a href="https://fuzi.in" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;">FUZI Elevators ↗</a></div>
+          <p class="dp-card-desc">Custom B2B commerce platform connecting Indian manufacturers of elevators, escalators, and parking technology directly with real estate developers. Built around custom solution requests, manufacturer catalogs, and quote workflows for vertical-transportation deals.</p>
+          <div class="dp-card-result">▸ Direct manufacturer-to-developer sourcing · Custom solutions across elevators, escalators &amp; parking tech</div>
+        </div>
+      </div>
+
     </div>
   </div>
 </section>
 
-<!-- Example Work Section 1 - Info Left, Preview Right >
-<section class="showcase-section">
-  <div class="container">
-    <div class="text-center mb-5">
-      <h2 class="display-6 fw-bold"></h2>
-      <p class="lead text-muted">Projects delivering real results</p>
-    </div>
 
-    <!---div class="row align-items-center g-5">
-      <div class="col-lg-6 showcase-info">
-        <h3>DreamWedAI</h3>
-        <p>
-          A serene cabin rental website designed to showcase the natural beauty of the property
-          and streamline the booking experience. Features integrated calendar availability,
-          online reservations, and stunning imagery that captures the essence of a peaceful getaway.
-        </p>
-        <div class="tech-stack">
-          <span class="tech-badge">Django</span>
-          <span class="tech-badge">Python</span>
-          <span class="tech-badge">PostgreSQL</span>
-          <span class="tech-badge">Responsive Design</span>
-        </div>
-        <a href="https://stoneycreekcabin.com" target="_blank" rel="noopener" class="btn btn-outline-primary mt-4">
-          <i class="bi bi-box-arrow-up-right me-2"></i>Visit Site
-        </a>
-      </div>
-      <div class="col-lg-6">
-        <div class="showcase-preview">
-          <img src="{% static 'images/showcase-stoneycreek.png' %}" alt="Stoney Creek Cabin website screenshot" loading="lazy">
-        </div>
-      </div>
-    </div--->
-  </div>
-</section--->
-
-<!-- Example Work Section 2 - Preview Left, Info Right >
-<section class="showcase-section">
+<!-- ═══════════════════════════════════════════════════════════
+     § 04 · INFRASTRUCTURE & CYBERSECURITY
+════════════════════════════════════════════════════════════ -->
+<section class="discipline-section" id="infrastructure">
   <div class="container">
-    <div class="row align-items-center g-5">
-      <div class="col-lg-6 order-lg-2 showcase-info">
-        <h3>DreamWedAI</h3>
-        <p>
-          A comprehensive wedding visualization platform for engaged and married couples. Built with a focus on making professional wedding input accessible, the site features multiple image generation tools, intuitive UX and secure monthly subscription.
-        </p>
-        <div class="tech-stack">
-          <span class="tech-badge">Python</span>
-          <span class="tech-badge">SaaS</span>
-          <span class="tech-badge">AI Integration</span>
-          <span class="tech-badge">Marketing Suite</span>
-        </div>
-        <a href="https://dreamwedai.com" target="_blank" rel="noopener" class="btn btn-outline-primary mt-4">
-          <i class="bi bi-box-arrow-up-right me-2"></i>Visit Site
-        </a>
-      </div>
-      <div class="col-lg-6 order-lg-1">
-        <div class="showcase-preview">
-          <img src="{% static 'images/wedding_1.jpg' %}" alt="DreamWedAI website screenshot" loading="lazy">
-        </div>
-      </div>
-    </div>
-  </div>
-</section--->
+    <div class="tm-layout ds-reveal">
 
-<!-- Marketing Section -->
-<section class="showcase-section">
-  <div class="container">
-    <div class="row align-items-center g-5">
-      <div class="col-lg-6 showcase-info">
-        <i class="bi bi-graph-up-arrow" style="font-size: 4rem; color: var(--accent-green); margin-bottom: 1rem; display: block;"></i>
-        <h3>Digital Marketing That's Smart</h3>
-        <p>
-          Your online presence is more than just a website. We create comprehensive digital experiences
-          that connect your brand with your target audience from the purchase experience to discovery.
-        </p>
-        <ul class="list-unstyled mt-4">
-          <li class="mb-3"><i class="bi bi-check-circle text-success me-2"></i>Search Engine Optimization (SEO)</li>
-          <li class="mb-3"><i class="bi bi-check-circle text-success me-2"></i>Social Media Automation</li>
-          <li class="mb-3"><i class="bi bi-check-circle text-success me-2"></i>Content Strategy & Creation</li>
-          <li class="mb-3"><i class="bi bi-check-circle text-success me-2"></i>Analytics & Performance Tracking</li>
-        </ul>
-        <a href="{% url 'services:catalog' %}" class="btn btn-primary mt-3">
-          Marketing Services
-        </a>
-      </div>
-      <div class="col-lg-6 text-center">
-        <div class="card p-4" style="background: linear-gradient(135deg, var(--darker-bg) 0%, var(--card-bg) 100%);">
-          <div class="row g-4">
-            <div class="col-6">
-              <div class="p-3">
-                <i class="bi bi-search" style="font-size: 2.5rem; color: var(--accent-green);"></i>
-                <h5 class="mt-2 mb-0">SEO</h5>
-                <small class="text-muted">Rank Higher</small>
-              </div>
-            </div>
-            <div class="col-6">
-              <div class="p-3">
-                <i class="bi bi-share" style="font-size: 2.5rem; color: var(--accent-green);"></i>
-                <h5 class="mt-2 mb-0">Social</h5>
-                <small class="text-muted">Engage Users</small>
-              </div>
-            </div>
-            <div class="col-6">
-              <div class="p-3">
-                <i class="bi bi-bar-chart-line" style="font-size: 2.5rem; color: var(--accent-green);"></i>
-                <h5 class="mt-2 mb-0">Analytics</h5>
-                <small class="text-muted">Track Growth</small>
-              </div>
-            </div>
-            <div class="col-6">
-              <div class="p-3">
-                <i class="bi bi-pencil-square" style="font-size: 2.5rem; color: var(--accent-green);"></i>
-                <h5 class="mt-2 mb-0">Content</h5>
-                <small class="text-muted">Tell Stories</small>
-              </div>
-            </div>
-          </div>
+      <!-- Left: journal articles -->
+      <div>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(245,242,234,0.4);display:block;margin-bottom:20px;">· From the journal</span>
+        <div class="tm-cards">
+
+          <a href="{% url 'blog:detail' 'the-real-cost-of-shopify-and-wix' %}" style="background:rgba(10,12,26,0.88);padding:24px;text-decoration:none;display:flex;flex-direction:column;gap:10px;transition:background 0.2s;" onmouseover="this.style.background='rgba(131,163,132,0.06)'" onmouseout="this.style.background='rgba(10,12,26,0.88)'">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:#83A384;">Cost analysis</span>
+            <span style="font-family:'Fraunces',serif;font-size:17px;font-weight:600;color:#f5f2ea;line-height:1.3;">The Real Lifetime Cost of Shopify and Wix</span>
+            <span style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:rgba(245,242,234,0.5);line-height:1.5;">Ten years, $240k, and you own nothing. The full breakdown versus custom software.</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#83A384;margin-top:auto;">Read →</span>
+          </a>
+
+          <a href="{% url 'blog:detail' 'data-centers-own-your-software' %}" style="background:rgba(10,12,26,0.88);padding:24px;text-decoration:none;display:flex;flex-direction:column;gap:10px;transition:background 0.2s;" onmouseover="this.style.background='rgba(131,163,132,0.06)'" onmouseout="this.style.background='rgba(10,12,26,0.88)'">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:#83A384;">Infrastructure &amp; Cybersecurity</span>
+            <span style="font-family:'Fraunces',serif;font-size:17px;font-weight:600;color:#f5f2ea;line-height:1.3;">Data Centers Are Getting Cheaper. Your Software Bill Shouldn't Be.</span>
+            <span style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:rgba(245,242,234,0.5);line-height:1.5;">Compute costs are falling. Software you own follows. Software you rent doesn't.</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#83A384;margin-top:auto;">Read →</span>
+          </a>
+
+          <a href="{% url 'blog:detail' 'when-cloudflare-goes-down' %}" style="background:rgba(10,12,26,0.88);padding:24px;text-decoration:none;display:flex;flex-direction:column;gap:10px;transition:background 0.2s;" onmouseover="this.style.background='rgba(131,163,132,0.06)'" onmouseout="this.style.background='rgba(10,12,26,0.88)'">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:#83A384;">Uptime &amp; resilience</span>
+            <span style="font-family:'Fraunces',serif;font-size:17px;font-weight:600;color:#f5f2ea;line-height:1.3;">When Cloudflare Goes Down: Why Businesses Need a Dev On Call</span>
+            <span style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:rgba(245,242,234,0.5);line-height:1.5;">The businesses that recovered fast all had one thing in common.</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#83A384;margin-top:auto;">Read →</span>
+          </a>
+
+        </div>
+        <div style="margin-top:14px;">
+          <a href="{% url 'blog:list' %}" class="ds-link" style="font-size:12px;">All articles →</a>
         </div>
       </div>
+
+      <!-- Right: section content -->
+      <div>
+        <span class="discipline-num">§ 04 · Infrastructure &amp; Cybersecurity</span>
+        <h2 class="discipline-h2">Secure infrastructure.<br>Hardened from day one.</h2>
+
+        <p class="discipline-body">Shipping is the beginning, not the end. We pair managed hosting and ongoing maintenance with active cybersecurity: penetration testing, compliance consulting, vulnerability management, and security architecture, so your systems stay fast, secure, and resilient against real threats.</p>
+
+        <div style="margin-bottom:28px;">
+          <div class="discipline-deliverable">Managed hosting on infrastructure you own</div>
+          <div class="discipline-deliverable">Penetration testing &amp; vulnerability management</div>
+          <div class="discipline-deliverable">Compliance consulting: HIPAA · PCI · SOC 2 · CMMC</div>
+          <div class="discipline-deliverable">Security architecture &amp; Zero Trust implementation</div>
+          <div class="discipline-deliverable">Automated backups, uptime monitoring &amp; alerting</div>
+        </div>
+
+        <div class="discipline-tags" style="margin-bottom:28px;">
+          <span class="atlas-tag">Penetration testing</span>
+          <span class="atlas-tag">Zero Trust</span>
+          <span class="atlas-tag">Compliance &amp; audit</span>
+          <span class="atlas-tag">Cloud security</span>
+          <span class="atlas-tag">Managed hosting</span>
+          <span class="atlas-tag">Monitoring &amp; alerting</span>
+        </div>
+
+        <div class="discipline-cta">
+          <a href="{% url 'contact' %}" class="ds-btn-solid">Discuss a security engagement →</a>
+          <a href="{% url 'services:catalog' %}" class="ds-link">Infrastructure &amp; cybersecurity services →</a>
+        </div>
+      </div>
+
     </div>
   </div>
 </section>
 
-<!-- Project Dashboard Section -->
-<section class="dashboard-preview-section">
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     FAQ + CTA — VI / Send us a brief
+════════════════════════════════════════════════════════════ -->
+<section class="faq-section">
   <div class="container">
-    <div class="row align-items-center g-5">
-      <div class="col-lg-6 order-lg-2">
-        <i class="bi bi-kanban" style="font-size: 4rem; color: var(--accent-green); margin-bottom: 1rem; display: block;"></i>
-        <h3 class="h2 mb-3">Your Personal Project Dashboard</h3>
-        <p class="text-muted mb-4">
-          When you work with us, you get more than just a final product. You get full visibility, input, and insight into
-          the development process through our custom project tracking system.
-        </p>
-        <h5 class="mb-3" style="color: var(--primary);">Dashboard Features:</h5>
-        <div class="row">
-          <div class="col-md-6">
-            <ul class="list-unstyled text-muted">
-              <li class="mb-2"><i class="bi bi-check-lg text-success me-2"></i>Real-time project status</li>
-              <li class="mb-2"><i class="bi bi-check-lg text-success me-2"></i>Timely Delivery</li>
-              <li class="mb-2"><i class="bi bi-check-lg text-success me-2"></i>Live preview access</li>
-            </ul>
+    <div class="faq-grid">
+
+      <!-- FAQ -->
+      <div>
+        <span class="ds-eyebrow" style="margin-bottom:14px;">· VI / FAQ</span>
+        <h2 class="ds-display" style="font-size:clamp(2rem,3.5vw,3.5rem);margin-bottom:32px;">Common questions.</h2>
+
+        <div style="padding:22px 0;border-top:1px solid rgba(245,242,234,0.18);">
+          <div style="display:flex;align-items:baseline;gap:14px;margin-bottom:8px;">
+            <span class="ds-eyebrow" style="margin:0;">Q.01</span>
+            <div style="font-family:'Fraunces',serif;font-size:22px;font-weight:600;color:#f5f2ea;">Who owns the code?</div>
           </div>
-          <div class="col-md-6">
-            <ul class="list-unstyled text-muted">
-              <li class="mb-2"><i class="bi bi-check-lg text-success me-2"></i>Direct communication</li>
-              <li class="mb-2"><i class="bi bi-check-lg text-success me-2"></i>Document repository</li>
-              <li class="mb-2"><i class="bi bi-check-lg text-success me-2"></i>Approval workflows</li>
-            </ul>
-          </div>
+          <div class="ds-body" style="font-size:16px;padding-left:48px;">You do. Every line, from day one. Repo is yours, hosting is yours, the keys are yours.</div>
         </div>
-        <a href="{% url 'about' %}" class="btn btn-outline-primary mt-3">
-          Learn More About Our Process
-        </a>
-      </div>
-      <div class="col-lg-6 order-lg-1 text-center">
-        <div class="card p-4">
-          <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-              <h5 class="mb-0">Project Progress</h5>
-              <span class="badge bg-primary">In Development</span>
-            </div>
-            <div class="progress mb-4" style="height: 20px;">
-              <div class="progress-bar bg-success" role="progressbar" style="width: 65%;" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100">65%</div>
-            </div>
-            <div class="text-start">
-              <div class="d-flex justify-content-between mb-2">
-                <span><i class="bi bi-check-circle text-success me-2"></i>Planning</span>
-                <span class="text-success">Complete</span>
-              </div>
-              <div class="d-flex justify-content-between mb-2">
-                <span><i class="bi bi-check-circle text-success me-2"></i>Design</span>
-                <span class="text-success">Complete</span>
-              </div>
-              <div class="d-flex justify-content-between mb-2">
-                <span><i class="bi bi-arrow-right-circle text-primary me-2"></i>Development</span>
-                <span class="text-primary">In Progress</span>
-              </div>
-              <div class="d-flex justify-content-between mb-2">
-                <span><i class="bi bi-circle text-muted me-2"></i>Testing</span>
-                <span class="text-muted">Pending</span>
-              </div>
-              <div class="d-flex justify-content-between">
-                <span><i class="bi bi-circle text-muted me-2"></i>Launch</span>
-                <span class="text-muted">Pending</span>
-              </div>
-            </div>
+
+        <div style="padding:22px 0;border-top:1px solid rgba(245,242,234,0.18);">
+          <div style="display:flex;align-items:baseline;gap:14px;margin-bottom:8px;">
+            <span class="ds-eyebrow" style="margin:0;">Q.02</span>
+            <div style="font-family:'Fraunces',serif;font-size:22px;font-weight:600;color:#f5f2ea;">What does a typical engagement look like?</div>
           </div>
+          <div class="ds-body" style="font-size:16px;padding-left:48px;">Two-week discovery, a fixed-fee build (6–12 weeks for web apps, 1–3 weeks for automations), and a fixed monthly retainer only if you want us operating it long-term.</div>
+        </div>
+
+        <div style="padding:22px 0;border-top:1px solid rgba(245,242,234,0.18);">
+          <div style="display:flex;align-items:baseline;gap:14px;margin-bottom:8px;">
+            <span class="ds-eyebrow" style="margin:0;">Q.03</span>
+            <div style="font-family:'Fraunces',serif;font-size:22px;font-weight:600;color:#f5f2ea;">Can you automate a tool we already use?</div>
+          </div>
+          <div class="ds-body" style="font-size:16px;padding-left:48px;">Almost certainly. If it has an API or a way to export data, we can automate it. Stripe, QuickBooks, HubSpot, Slack, Google Workspace, Airtable, and dozens more.</div>
+        </div>
+
+        <div style="padding:22px 0;border-top:1px solid rgba(245,242,234,0.18);">
+          <div style="display:flex;align-items:baseline;gap:14px;margin-bottom:8px;">
+            <span class="ds-eyebrow" style="margin:0;">Q.04</span>
+            <div style="font-family:'Fraunces',serif;font-size:22px;font-weight:600;color:#f5f2ea;">Do you only work East Coast?</div>
+          </div>
+          <div class="ds-body" style="font-size:16px;padding-left:48px;">We're East Coast based but ship globally. Most clients we never meet in person. Async works fine when communication is clear.</div>
         </div>
       </div>
+
+      <!-- CTA panel -->
+      <div>
+        <div class="cta-panel">
+          <span class="ds-corner ds-corner-tl"></span>
+          <span class="ds-corner ds-corner-tr"></span>
+          <span class="ds-corner ds-corner-bl"></span>
+          <span class="ds-corner ds-corner-br"></span>
+          <span class="ds-eyebrow">· VII / Start a dispatch</span>
+<div class="cta-panel-title">Send us<br>a brief.</div>
+          <p class="cta-panel-body">A sentence is enough. We'll reply within 24 hours with a fixed scope, fixed price, and a start date you can put on the calendar.</p>
+          <div class="cta-btn-stack">
+            <a href="{% url 'contact' %}" class="ds-btn-solid" style="justify-content:space-between;">Start a project <span>→</span></a>
+            <a href="{% url 'services:catalog' %}" class="ds-btn" style="justify-content:space-between;">Browse Services <span>→</span></a>
+            <a href="{% url 'contact' %}" class="ds-btn" style="justify-content:space-between;">hello@cactuscatsoftware.com <span>↗</span></a>
+          </div>
+          <p class="cta-footer">· Office hours · Mon–Fri · 09:00–18:00 ET · Reply ≤ 24h · USA based · Fixed fee</p>
+        </div>
+      </div>
+
     </div>
   </div>
 </section>
 
-<!-- Cybersecurity Section -->
-<section class="showcase-section">
-  <div class="container">
-    <div class="row align-items-center g-5">
-      <div class="col-lg-6 showcase-info">
-        <i class="bi bi-shield-lock" style="font-size: 4rem; color: var(--accent-green); margin-bottom: 1rem; display: block;"></i>
-        <h3>Cybersecurity</h3>
-        <p>
-          In today's digital landscape, security isn't optional, it's essential. We provide comprehensive
-          cybersecurity services to protect your business from threats, ensure compliance, and give you
-          peace of mind knowing your local and cloud systems are secure.
-        </p>
-        <ul class="list-unstyled mt-4">
-          <li class="mb-3"><i class="bi bi-check-circle text-success me-2"></i>Security Assessments & Penetration Testing</li>
-          <li class="mb-3"><i class="bi bi-check-circle text-success me-2"></i>Vulnerability Management</li>
-          <li class="mb-3"><i class="bi bi-check-circle text-success me-2"></i>Compliance Consulting (HIPAA, PCI-DSS, SOC 2)</li>
-          <li class="mb-3"><i class="bi bi-check-circle text-success me-2"></i>Security Awareness Training</li>
-        </ul>
-        <a href="{% url 'services:catalog' %}" class="btn btn-primary mt-3">
-          Security Services
-        </a>
-      </div>
-      <div class="col-lg-6 text-center">
-        <div class="card p-4" style="background: linear-gradient(135deg, var(--darker-bg) 0%, var(--card-bg) 100%);">
-          <div class="row g-4">
-            <div class="col-6">
-              <div class="p-3">
-                <i class="bi bi-bug" style="font-size: 2.5rem; color: var(--accent-green);"></i>
-                <h5 class="mt-2 mb-0">Pen Testing</h5>
-                <small class="text-muted">Find Weaknesses</small>
-              </div>
-            </div>
-            <div class="col-6">
-              <div class="p-3">
-                <i class="bi bi-file-earmark-lock" style="font-size: 2.5rem; color: var(--accent-green);"></i>
-                <h5 class="mt-2 mb-0">Compliance</h5>
-                <small class="text-muted">Stay Certified</small>
-              </div>
-            </div>
-            <div class="col-6">
-              <div class="p-3">
-                <i class="bi bi-eye" style="font-size: 2.5rem; color: var(--accent-green);"></i>
-                <h5 class="mt-2 mb-0">Monitoring</h5>
-                <small class="text-muted">24/7 Watch</small>
-              </div>
-            </div>
-            <div class="col-6">
-              <div class="p-3">
-                <i class="bi bi-person-badge" style="font-size: 2.5rem; color: var(--accent-green);"></i>
-                <h5 class="mt-2 mb-0">Training</h5>
-                <small class="text-muted">Educate Teams</small>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+{% endblock content %}
 
-<!-- Contact -->
-<section class="container py-4 text-center"><br><br>
-  <p class="text-muted mb-0">We love to talk: <a href="mailto:hello@cactuscatsoftware.com">hello@cactuscatsoftware.com</a></p>
-</section>
 
-{% endblock %}
+{% block inline_javascript %}
+{{ block.super }}
+<script>
+(function () {
+
+  /* ── Full-page depth starfield ───────────────────────── */
+  const canvas = document.getElementById('pageStars');
+  if (canvas) {
+    const ctx = canvas.getContext('2d');
+    const W = () => window.innerWidth;
+    const H = () => window.innerHeight;
+    const STAR_DENSITY = 35;
+    let stars = [], scrollY = 0, smoothScroll = 0;
+
+    function pageH() { return Math.max(document.body.scrollHeight, H() * 6); }
+    function starCount() { return Math.round(STAR_DENSITY * pageH() / H()); }
+
+    function resize() { canvas.width = W(); canvas.height = H(); }
+
+    function initStars() {
+      stars = [];
+      const total = starCount();
+      for (let i = 0; i < total; i++) {
+        const pageRatio = Math.random(), depth = pageRatio;
+        stars.push({
+          x: Math.random() * W(),
+          pageY: pageRatio * pageH(),
+          depth,
+          r: 0.15 + depth * depth * 2.65,
+          oBase: 0.08 + depth * 0.78,
+          twinkleAmp: 0.15 + depth * 0.55,
+          twinkleSpeed: 0.0008 + depth * 0.0035,
+          phase: Math.random() * Math.PI * 2,
+          warm: depth > 0.7 && Math.random() < 0.18,
+          cool: depth > 0.85 && Math.random() < 0.12,
+          glow: depth > 0.72,
+        });
+      }
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, W(), H());
+
+      stars.forEach(s => {
+        const pf = 0.05 + s.depth * 0.95;
+        const sy = s.pageY - smoothScroll * pf;
+        if (sy < -10 || sy > H() + 10) return;
+        s.phase += s.twinkleSpeed;
+        const twinkle = 1 - s.twinkleAmp * (0.5 + 0.5 * Math.sin(s.phase));
+        const op = Math.max(0, Math.min(1, s.oBase * twinkle));
+        const color = s.warm ? `rgba(255,215,150,${op})` : s.cool ? `rgba(180,210,255,${op})` : `rgba(235,242,255,${op})`;
+        if (s.glow && s.r > 1.5) {
+          const g = ctx.createRadialGradient(s.x, sy, 0, s.x, sy, s.r * 5);
+          g.addColorStop(0, s.warm ? `rgba(255,200,100,${op*0.18})` : `rgba(200,220,255,${op*0.14})`);
+          g.addColorStop(1, 'rgba(0,0,0,0)');
+          ctx.beginPath(); ctx.arc(s.x, sy, s.r * 5, 0, Math.PI * 2);
+          ctx.fillStyle = g; ctx.fill();
+        }
+        ctx.beginPath(); ctx.arc(s.x, sy, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = color; ctx.fill();
+      });
+      requestAnimationFrame(draw);
+    }
+
+    window.addEventListener('scroll', () => { scrollY = window.scrollY; }, { passive: true });
+    (function tick() { smoothScroll += (scrollY - smoothScroll) * 0.07; requestAnimationFrame(tick); })();
+    resize(); initStars(); draw();
+    window.addEventListener('resize', () => { resize(); initStars(); });
+    window.addEventListener('load', () => { initStars(); });
+  }
+
+  /* ── Hero cycling text ───────────────────────────────── */
+  const words = document.querySelectorAll('.hero-cycle-word');
+  if (words.length) {
+    let cur = 0;
+    setInterval(() => {
+      words[cur].classList.remove('active');
+      cur = (cur + 1) % words.length;
+      words[cur].classList.add('active');
+    }, 4000);
+  }
+
+  /* ── Live clock in dispatch panel ────────────────────── */
+  function updateClock() {
+    const now = new Date();
+    const ts = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    const el = document.getElementById('liveTs');
+    if (el) el.textContent = ts;
+  }
+  updateClock();
+  setInterval(updateClock, 30000);
+
+  /* ── Scroll reveal ───────────────────────────────────── */
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
+    });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.ds-reveal').forEach(el => obs.observe(el));
+
+})();
+</script>
+{% endblock inline_javascript %}

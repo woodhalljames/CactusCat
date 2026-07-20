@@ -5,7 +5,7 @@ from model_utils.models import TimeStampedModel
 
 
 class ServiceCategory(TimeStampedModel):
-    """Main service categories (Web Dev, Cybersecurity, etc.)"""
+    """Main service categories (Custom Software, Automation & AI, Technical Marketing, Infrastructure)"""
 
     name = models.CharField(_("Category Name"), max_length=100)
     slug = models.SlugField(unique=True)
@@ -51,6 +51,11 @@ class ServicePackage(TimeStampedModel):
         _("Features"),
         help_text="One feature per line",
     )
+    who_its_for = models.TextField(
+        _("Who It's For"),
+        blank=True,
+        help_text="One ideal client type per line (e.g. 'Small business owners', 'SaaS founders')",
+    )
     description = models.TextField(
         _("Full Description"),
         help_text="Detailed description for service detail page",
@@ -58,6 +63,22 @@ class ServicePackage(TimeStampedModel):
 
     # Pricing & media
     price = models.DecimalField(_("Price"), max_digits=10, decimal_places=2)
+    setup_fee = models.DecimalField(
+        _("Financing Setup Fee"),
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text="Upfront deposit for the financed/subscription option",
+    )
+    monthly_price = models.DecimalField(
+        _("Monthly Financing Price"),
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text="Monthly rate for the financed option (shown in financing popup)",
+    )
     is_price_starting_from = models.BooleanField(
         _("Starting From Price"),
         default=False,
@@ -90,5 +111,7 @@ class ServicePackage(TimeStampedModel):
         return reverse("services:detail", kwargs={"slug": self.slug})
 
     def get_features_list(self):
-        """Return features as a list (one per line)"""
         return [f.strip() for f in self.features.split("\n") if f.strip()]
+
+    def get_who_its_for_list(self):
+        return [w.strip() for w in self.who_its_for.split("\n") if w.strip()]

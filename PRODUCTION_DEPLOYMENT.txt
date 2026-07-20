@@ -1,0 +1,193 @@
+CACTUS CAT SOFTWARE — PRODUCTION DEPLOYMENT GUIDE
+====================================================
+Last updated: June 2026
+
+
+1. HOSTINGER VPS SETUP
+-----------------------
+VPS: Hostinger KVM 1, Ubuntu 22.04 LTS
+IP:  145.223.126.107
+SSH: ssh root@145.223.126.107
+
+Docker is already installed. If setting up fresh:
+
+    curl -fsSL https://get.docker.com | sh
+    apt install docker-compose-plugin -y
+
+Stop system nginx before deploying (it conflicts with Traefik on port 80/443):
+
+    systemctl stop nginx && systemctl disable nginx
+
+
+2. MEDIA STORAGE
+-----------------
+Media files (project images, invoices, uploads) are stored directly on the VPS
+in a Docker volume: production_media_data
+
+No S3 bucket or Cloudflare R2 is needed. Nginx serves /media/ from the volume.
+
+If disk space ever becomes a concern, the volume lives at:
+    /var/lib/docker/volumes/cactus_cat_software_production_media_data/
+
+
+3. FILL IN THE ENVIRONMENT FILE
+---------------------------------
+Create .envs/.production/.django on the server with these values:
+
+  Email (sends via the hello@cactuscatsoftware.com Gmail account):
+    EMAIL_HOST_USER=hello@cactuscatsoftware.com
+    GOOGLE_PASS="xxxx xxxx xxxx xxxx"   (Gmail App Password — generate at
+      myaccount.google.com > Security > App Passwords; requires 2FA on the account)
+    DJANGO_SERVER_EMAIL=hello@cactuscatsoftware.com
+
+  Already set and correct (do not change):
+    DJANGO_SECRET_KEY
+    DJANGO_ADMIN_URL
+    DJANGO_ALLOWED_HOSTS
+    REDIS_URL
+    POSTGRES credentials
+    WEB_CONCURRENCY=4
+
+  Optional (leave blank to skip for now):
+    SENTRY_DSN   (error tracking, can add after launch)
+
+
+4. CLOUDFLARE DNS & SSL
+------------------------
+DNS records are already configured in Cloudflare (proxied):
+  A     cactuscatsoftware.com     > 145.223.126.107  (Proxied)
+  CNAME www.cactuscatsoftware.com > cactuscatsoftware.com  (Proxied)
+
+IMPORTANT — SSL/TLS mode must be set to Full (Strict):
+  Cloudflare dashboard > SSL/TLS > Overview > Full (Strict)
+
+  Flexible mode will cause redirect loops.
+  Full (Strict) is correct because Traefik issues its own Let's Encrypt cert.
+
+If Let's Encrypt cert fails to issue, temporarily set DNS to "DNS only"
+(grey cloud), let Traefik issue the cert, then re-enable the proxy.
+
+
+5. DEPLOY
+----------
+Push code from local machine to the VPS:
+
+    rsync -avz --progress --exclude='.venv' --exclude='__pycache__' --exclude='*.pyc' \
+        /home/james/Desktop/Projects/CactusCat/cactus_cat_software/ \
+        root@145.223.126.107:/root/cactus_cat/
+
+Then SSH in and start the stack:
+
+    ssh root@145.223.126.107
+    cd /root/cactus_cat
+    docker compose -f docker-compose.production.yml up -d --build
+
+Traefik issues the SSL certificate automatically. The site should be live
+within 60 seconds, provided DNS is pointed at the VPS.
+
+
+6. POST-LAUNCH SETUP
+---------------------
+Create your admin superuser:
+
+    docker compose -f docker-compose.production.yml exec django \
+        python manage.py createsuperuser
+
+Run pending migrations (if needed manually):
+
+    docker compose -f docker-compose.production.yml exec django \
+        python manage.py migrate
+
+Admin panel URL:
+    https://cactuscatsoftware.com/orl2q8D3m0w2UMhlMxYS9Dbk7KkedqQr/
+
+View live logs:
+    docker compose -f docker-compose.production.yml logs -f django
+
+
+7. SEEDING CONTENT FROM LOCAL TO PRODUCTION
+---------------------------------------------
+Blog posts, services, and projects are seeded via Django fixtures + media file copy.
+
+STEP 1 — Dump local data (run on your local machine):
+
+    docker compose -f docker-compose.local.yml exec django \
+        python manage.py dumpdata \
+            blog services projects \
+            --indent 2 --natural-foreign --natural-primary \
+            -o /app/fixtures_export.json
+
+This writes the file inside the container at /app/fixtures_export.json, which maps
+to your local project root as fixtures_export.json.
+
+STEP 2 — Copy fixture and media to the server:
+
+    scp fixtures_export.json root@145.223.126.107:/root/cactus_cat/
+    rsync -avz --progress cactus_cat_software/media/ \
+        root@145.223.126.107:/root/cactus_cat/cactus_cat_software/media/
+
+    Note: the media folder will be picked up by the production_media_data volume
+    on first run. If the stack is already running, copy into the volume directly:
+
+    rsync -avz --progress cactus_cat_software/media/ \
+        root@145.223.126.107:/var/lib/docker/volumes/cactus_cat_production_media_data/_data/
+
+STEP 3 — Load the fixture on the server (SSH in first):
+
+    docker compose -f docker-compose.production.yml exec django \
+        python manage.py loaddata /app/fixtures_export.json
+
+STEP 4 — Clean up:
+
+    rm /root/cactus_cat/fixtures_export.json
+
+
+8. AFTER LAUNCH (WITHIN FIRST WEEK)
+-------------------------------------
+  1. Confirm HTTPS is working on both www and root domain
+  2. Send a test email through the admin panel to confirm Gmail SMTP is connected
+  3. Upload a test image through the blog or projects to confirm media storage works
+  4. Once HTTPS has been stable for a few days, update SECURE_HSTS_SECONDS
+     from 60 to 518400 in config/settings/production.py, then redeploy
+  5. Optionally add SENTRY_DSN for error tracking
+
+
+9. ARCHITECTURE OVERVIEW
+--------------------------
+The stack runs entirely in Docker on the VPS:
+
+  Traefik          Handles incoming traffic, SSL termination, HTTPS redirect
+  Nginx            Serves /media/ files from volume; proxies all else to Django
+  Django/Gunicorn  Serves the application (4 workers)
+  PostgreSQL       Primary database
+  Redis            Caching and Celery task queue
+  Celery worker    Background tasks (order emails, etc.)
+  Celery beat      Scheduled tasks
+  Local volume     Uploaded media files stored on VPS disk
+  WhiteNoise       Serves static files directly from Gunicorn
+
+
+10. USEFUL COMMANDS
+-------------------
+  # Restart just the Django container
+  docker compose -f docker-compose.production.yml restart django
+
+  # Stop everything
+  docker compose -f docker-compose.production.yml down
+
+  # Push latest code and rebuild
+  rsync -avz --progress --exclude='.venv' --exclude='__pycache__' --exclude='*.pyc' \
+      /home/james/Desktop/Projects/CactusCat/cactus_cat_software/ \
+      root@145.223.126.107:/root/cactus_cat/
+  ssh root@145.223.126.107 "cd /root/cactus_cat && docker compose -f docker-compose.production.yml up -d --build"
+
+  # Check all container statuses
+  docker compose -f docker-compose.production.yml ps
+
+  # Open a Django shell
+  docker compose -f docker-compose.production.yml exec django python manage.py shell
+
+  # Backup the media volume manually
+  docker run --rm -v cactus_cat_software_production_media_data:/media \
+      -v /root/backups:/backup alpine \
+      tar czf /backup/media_backup_$(date +%Y%m%d).tar.gz /media

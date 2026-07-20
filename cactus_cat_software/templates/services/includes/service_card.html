@@ -9,13 +9,6 @@
       <h3 class="h4 card-title">{{ service.name }}</h3>
       <p class="text-muted">{{ service.short_description }}</p>
 
-      <div class="price my-3">
-        {% if service.is_price_starting_from %}
-          Starting from
-        {% endif %}
-        ${{ service.price }}
-      </div>
-
       {% if service.features %}
         <ul class="features-list mb-4">
           {% for feature in service.get_features_list %}
@@ -26,15 +19,15 @@
 
       <div class="mt-auto">
         <div class="d-grid gap-2">
+          <a href="{% url 'contact' %}" class="btn btn-primary w-100">
+            <i class="bi bi-calendar2-check me-2"></i>Book a Meeting
+          </a>
           <form method="post" action="{% url 'orders:cart_add' service.id %}" class="add-to-cart-form">
             {% csrf_token %}
-            <button type="submit" class="btn btn-primary w-100">
-              <i class="bi bi-cart-plus me-2"></i>Add to Cart
+            <button type="submit" class="btn btn-outline-primary w-100">
+              <i class="bi bi-clipboard-plus me-2"></i>Add to Quote
             </button>
           </form>
-          <a href="{% url 'services:detail' service.slug %}" class="btn btn-outline-primary w-100">
-            Learn More
-          </a>
         </div>
       </div>
     </div>

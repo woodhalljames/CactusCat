@@ -1,13 +1,157 @@
 {% extends "base.html" %}
 
-{% block title %}Forbidden (403){% endblock title %}
+{% block title %}403 — Forbidden | Cactus Cat Software{% endblock %}
+
 {% block content %}
-  <h1>Forbidden (403)</h1>
-  <p>
-    {% if exception %}
-      {{ exception }}
-    {% else %}
-      You're not allowed to access this page.
-    {% endif %}
-  </p>
-{% endblock content %}
+<div class="error-page">
+  <div class="error-terminal">
+    <div class="error-terminal-bar">
+      <span class="terminal-dot dot-red"></span>
+      <span class="terminal-dot dot-yellow"></span>
+      <span class="terminal-dot dot-green"></span>
+      <span class="terminal-title">bash — cactus_cat</span>
+    </div>
+    <div class="error-terminal-body">
+      <p class="terminal-line"><span class="terminal-prompt">~/</span> <span class="terminal-cmd">sudo cat {{ request.path }}</span></p>
+      <p class="terminal-output error-output">sudo: Permission denied</p>
+      <p class="terminal-output error-output">Access restricted to authorised users only.</p>
+      <p class="terminal-line mt-2"><span class="terminal-prompt">~/</span> <span class="terminal-cmd">echo $?</span></p>
+      <p class="terminal-output">1</p>
+      <p class="terminal-line mt-3"><span class="terminal-prompt">~/</span> <span class="terminal-cursor">▋</span></p>
+    </div>
+  </div>
+
+  <div class="error-info">
+    <div class="error-code">403</div>
+    <h1 class="error-heading">Access Forbidden</h1>
+    <p class="error-message">You don't have permission to view this page.</p>
+    <div class="error-actions">
+      <a href="/" class="btn btn-primary">~/home</a>
+      <a href="/accounts/login/" class="btn btn-outline-secondary">~/sign-in</a>
+    </div>
+  </div>
+</div>
+
+<style>
+.error-page {
+  min-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+  gap: 2.5rem;
+}
+
+.error-terminal {
+  width: 100%;
+  max-width: 560px;
+  background: var(--darker-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+}
+
+.error-terminal-bar {
+  background: #2a2a3e;
+  padding: 0.6rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.terminal-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.dot-red    { background: #ff5f57; }
+.dot-yellow { background: #febc2e; }
+.dot-green  { background: #28c840; }
+
+.terminal-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--muted-text);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.error-terminal-body {
+  padding: 1.25rem 1.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  line-height: 1.8;
+}
+
+.terminal-line { margin: 0; }
+
+.terminal-prompt {
+  color: var(--accent-green);
+  font-weight: 600;
+}
+
+.terminal-cmd   { color: var(--light-text); }
+
+.terminal-output {
+  color: var(--muted-text);
+  padding-left: 1rem;
+  margin: 0;
+}
+
+.error-output { color: #e5c07b; }
+
+.terminal-cursor {
+  display: inline-block;
+  color: var(--accent-green);
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+.error-info { text-align: center; }
+
+.error-code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 5rem;
+  font-weight: 700;
+  color: #e5c07b;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.error-heading {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.error-message {
+  color: var(--muted-text);
+  margin-bottom: 1.5rem;
+}
+
+.error-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-outline-secondary {
+  border-color: var(--border-color);
+  color: var(--muted-text);
+}
+.btn-outline-secondary:hover {
+  background: var(--surface);
+  color: var(--light-text);
+  border-color: var(--accent-green);
+}
+</style>
+{% endblock %}

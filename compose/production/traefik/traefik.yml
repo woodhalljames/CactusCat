@@ -31,8 +31,7 @@ certificatesResolvers:
 http:
   routers:
     web-secure-router:
-      # Main Django app - excludes client preview paths
-      rule: '(Host(`cactuscatsoftware.com`) || Host(`www.cactuscatsoftware.com`)) && !PathPrefix(`/{path:[a-z0-9-]+-preview}`)'
+      rule: 'Host(`cactuscatsoftware.com`) || Host(`www.cactuscatsoftware.com`)'
       entryPoints:
         - web-secure
       middlewares:
@@ -62,7 +61,7 @@ http:
     django:
       loadBalancer:
         servers:
-          - url: http://django:5000
+          - url: http://nginx:80
 
     flower:
       loadBalancer:
@@ -74,8 +73,3 @@ providers:
   file:
     filename: /etc/traefik/traefik.yml
     watch: true
-  # Docker provider for dynamic client preview containers
-  docker:
-    endpoint: "unix:///var/run/docker.sock"
-    exposedByDefault: false
-    network: traefik-public

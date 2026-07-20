@@ -51,7 +51,7 @@ class CheckoutView(CreateView):
 
         messages.success(
             self.request,
-            f"Order placed successfully! Check {form.instance.customer_email} for confirmation.",
+            f"Quote request sent! Check {form.instance.customer_email} for confirmation.",
         )
 
         return response
@@ -94,16 +94,26 @@ class CartAddView(View):
     def post(self, request, service_id):
         cart = Cart(request)
         service = get_object_or_404(ServicePackage, id=service_id, is_active=True)
+        already_in_cart = str(service.id) in cart.cart
         cart.add(service_package=service, quantity=1, override_quantity=False)
 
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            if already_in_cart:
+                return JsonResponse({
+                    'success': True,
+                    'cart_count': len(cart),
+                    'message': f'{service.name} is already in your quote'
+                })
             return JsonResponse({
                 'success': True,
                 'cart_count': len(cart),
-                'message': f'{service.name} added to cart'
+                'message': f'{service.name} added to quote'
             })
 
-        messages.success(request, f'{service.name} added to cart')
+        if already_in_cart:
+            messages.info(request, f'{service.name} is already in your quote')
+        else:
+            messages.success(request, f'{service.name} added to quote')
         return redirect('orders:cart_detail')
 
 
@@ -185,7 +195,7 @@ class CartCheckoutView(CreateView):
 
         messages.success(
             self.request,
-            f"Order placed successfully! Check {form.instance.customer_email} for confirmation.",
+            f"Quote request sent! Check {form.instance.customer_email} for confirmation.",
         )
 
         return redirect(self.get_success_url())

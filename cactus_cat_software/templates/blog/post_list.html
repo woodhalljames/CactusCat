@@ -1,55 +1,297 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Blog{% endblock %}
+{% block title %}Journal | Cactus Cat Software{% endblock %}
+{% block meta_description %}Field notes, build logs, and thoughts on today from Cactus Cat Software.{% endblock %}
+
+{% block css %}
+{{ block.super }}
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,400&display=swap" rel="stylesheet">
+<style>
+  html { background: #0a0c1a; }
+  body { font-family: 'Space Grotesk', sans-serif; background: transparent !important; }
+  #pageStars { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; }
+  footer { background: transparent !important; position: relative; z-index: 1; }
+
+  .journal-wrap { padding: 80px 0 120px; position: relative; z-index: 1; }
+
+  /* ── Header ────────────────────────────────────────────── */
+  .journal-header {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    margin-bottom: 48px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid rgba(245,242,234,0.12);
+  }
+
+  .journal-count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; letter-spacing: 0.2em;
+    color: rgba(245,242,234,0.4);
+    margin-top: 10px;
+  }
+
+  /* ── Card grid ─────────────────────────────────────────── */
+  .post-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-bottom: 56px;
+  }
+
+  .post-card {
+    background: rgba(10,12,26,0.82);
+    display: flex; flex-direction: column;
+    transition: background 0.18s, box-shadow 0.18s;
+    overflow: hidden;
+    border: 1px solid rgba(131,163,132,0.22);
+  }
+
+  .post-card:hover {
+    background: rgba(131,163,132,0.07);
+    box-shadow: 0 0 18px rgba(131,163,132,0.1);
+  }
+
+  /* ── Card image ─────────────────────────────────────────── */
+  .post-card-img-wrap {
+    display: block;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .post-card-img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+  .post-card:hover .post-card-img { transform: scale(1.03); }
+
+  .post-card-img-placeholder {
+    width: 100%; height: 100%;
+    background: rgba(131,163,132,0.06);
+    border-bottom: 1px solid rgba(131,163,132,0.12);
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .post-card-img-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.18em;
+    color: rgba(245,242,234,0.18);
+  }
+
+  /* ── Card body ──────────────────────────────────────────── */
+  .post-card-body {
+    padding: 20px 22px 22px;
+    display: flex; flex-direction: column;
+    flex: 1;
+  }
+
+  .post-card-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.16em;
+    color: rgba(245,242,234,0.35);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+  }
+
+  .post-card-title {
+    font-family: 'Fraunces', serif;
+    font-size: 1.175rem; font-weight: 600;
+    color: #f5f2ea; letter-spacing: -0.01em;
+    line-height: 1.3; margin: 0 0 10px;
+  }
+
+  .post-card-title a {
+    color: inherit; text-decoration: none;
+    transition: color 0.15s;
+  }
+  .post-card-title a:hover { color: #83A384; }
+
+  .post-card-excerpt {
+    font-family: 'Fraunces', serif;
+    font-size: 15px; color: rgba(245,242,234,0.48);
+    line-height: 1.6; margin: 0 0 16px;
+    flex: 1;
+    display: -webkit-box; -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical; overflow: hidden;
+  }
+
+  .post-card-link {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.18em;
+    text-transform: uppercase; color: #83A384;
+    text-decoration: none; margin-top: auto;
+    transition: opacity 0.15s;
+  }
+  .post-card-link:hover { opacity: 0.7; text-decoration: none; }
+
+  /* ── Empty state ───────────────────────────────────────── */
+  .journal-empty {
+    padding: 80px 0; text-align: center;
+    border-top: 1px solid rgba(131,163,132,0.2);
+  }
+
+  /* ── Pagination ────────────────────────────────────────── */
+  .ds-pagination {
+    display: flex; gap: 4px; justify-content: center; align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .ds-page-link {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; letter-spacing: 0.1em;
+    padding: 7px 13px;
+    border: 1px solid rgba(131,163,132,0.22);
+    color: rgba(245,242,234,0.5);
+    text-decoration: none;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .ds-page-link:hover { border-color: #83A384; color: #f5f2ea; text-decoration: none; }
+  .ds-page-link.active { border-color: #83A384; color: #83A384; pointer-events: none; }
+  .ds-page-link.disabled { opacity: 0.25; pointer-events: none; }
+  .ds-page-ellipsis {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; color: rgba(245,242,234,0.3);
+    padding: 7px 6px;
+  }
+
+  /* ── Responsive ────────────────────────────────────────── */
+  @media (max-width: 900px)  { .post-grid { grid-template-columns: repeat(2, 1fr); } .journal-header { flex-direction: column; align-items: flex-start; gap: 16px; } }
+  @media (max-width: 540px)  { .post-grid { grid-template-columns: 1fr; } }
+</style>
+{% endblock css %}
 
 {% block content %}
-<div class="container py-5">
-  <div class="text-center mb-5">
-    <h1 class="display-4 fw-bold">Blog</h1>
-    <p class="lead text-muted">Insights, tutorials, and industry news</p>
-  </div>
+<canvas id="pageStars"></canvas>
 
-  {% if posts %}
-    <div class="row g-4">
-      {% for post in posts %}
-        {% include "blog/includes/post_card.html" %}
-      {% endfor %}
+<div class="journal-wrap">
+  <div class="container">
+
+    <div class="journal-header ds-reveal">
+      <div>
+        <span class="ds-eyebrow">· Field journal</span>
+        <h1 class="ds-display" style="font-size:clamp(3rem,6vw,5.5rem);margin:8px 0 0;">
+          Industry <em style="font-style:italic;color:#83A384;">notes.</em>
+        </h1>
+        {% if paginator %}
+          <div class="journal-count">{{ paginator.count }} entr{{ paginator.count|pluralize:"y,ies" }}</div>
+        {% endif %}
+      </div>
+      <p class="ds-coord" style="max-width:280px;text-align:right;margin:0;">
+        · Build logs, testimony, and dispatches from the field.
+      </p>
     </div>
 
-    {% if is_paginated %}
-      <nav aria-label="Blog pagination" class="mt-5">
-        <ul class="pagination justify-content-center">
+    {% if posts %}
+
+      <div class="post-grid ds-reveal ds-reveal-d1">
+        {% for post in posts %}
+          {% include "blog/includes/post_card.html" %}
+        {% endfor %}
+      </div>
+
+      {% if is_paginated %}
+        <nav class="ds-pagination" aria-label="Journal pagination">
+
           {% if page_obj.has_previous %}
-            <li class="page-item">
-              <a class="page-link" href="?page=1">First</a>
-            </li>
-            <li class="page-item">
-              <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
-            </li>
+            <a class="ds-page-link" href="?page=1">« First</a>
+            <a class="ds-page-link" href="?page={{ page_obj.previous_page_number }}">‹ Prev</a>
+          {% else %}
+            <span class="ds-page-link disabled">« First</span>
+            <span class="ds-page-link disabled">‹ Prev</span>
           {% endif %}
 
-          <li class="page-item active">
-            <span class="page-link">
-              Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
-            </span>
-          </li>
+          {% for num in paginator.page_range %}
+            {% if num == page_obj.number %}
+              <span class="ds-page-link active">{{ num }}</span>
+            {% elif num == 1 or num == paginator.num_pages %}
+              <a class="ds-page-link" href="?page={{ num }}">{{ num }}</a>
+            {% elif num >= page_obj.number|add:"-2" and num <= page_obj.number|add:"2" %}
+              <a class="ds-page-link" href="?page={{ num }}">{{ num }}</a>
+            {% elif num == page_obj.number|add:"-3" or num == page_obj.number|add:"3" %}
+              <span class="ds-page-ellipsis">···</span>
+            {% endif %}
+          {% endfor %}
 
           {% if page_obj.has_next %}
-            <li class="page-item">
-              <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
-            </li>
-            <li class="page-item">
-              <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
-            </li>
+            <a class="ds-page-link" href="?page={{ page_obj.next_page_number }}">Next ›</a>
+            <a class="ds-page-link" href="?page={{ paginator.num_pages }}">Last »</a>
+          {% else %}
+            <span class="ds-page-link disabled">Next ›</span>
+            <span class="ds-page-link disabled">Last »</span>
           {% endif %}
-        </ul>
-      </nav>
+
+        </nav>
+      {% endif %}
+
+    {% else %}
+      <div class="journal-empty">
+        <span class="ds-eyebrow" style="display:block;margin-bottom:16px;">· No entries logged yet</span>
+        <p class="ds-body" style="font-size:16px;margin:0;">Check back soon — the first dispatch is on its way.</p>
+      </div>
     {% endif %}
-  {% else %}
-    <div class="text-center py-5">
-      <p class="text-muted">No blog posts available yet. Check back soon!</p>
-    </div>
-  {% endif %}
+
+  </div>
 </div>
-{% endblock %}
+{% endblock content %}
+
+{% block inline_javascript %}
+{{ block.super }}
+<script>
+(function () {
+  const canvas = document.getElementById('pageStars');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = () => window.innerWidth, H = () => window.innerHeight;
+  const DENSITY = 60;
+  let stars = [], scrollY = 0, smooth = 0;
+
+  function pageH() { return Math.max(document.body.scrollHeight, H() * 4); }
+
+  function resize() { canvas.width = W(); canvas.height = H(); }
+
+  function init() {
+    stars = [];
+    const total = Math.round(DENSITY * pageH() / H());
+    for (let i = 0; i < total; i++) {
+      const d = Math.random();
+      stars.push({ x: Math.random()*W(), pageY: Math.random()*pageH(), depth: d,
+        r: 0.15+d*d*2.6, oBase: 0.08+d*0.78, twA: 0.15+d*0.55,
+        twS: 0.0008+d*0.0035, ph: Math.random()*Math.PI*2,
+        warm: d>0.7&&Math.random()<0.18, cool: d>0.85&&Math.random()<0.12, glow: d>0.72 });
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0,0,W(),H());
+    stars.forEach(s => {
+      const pf = 0.05+s.depth*0.95, sy = s.pageY - smooth*pf;
+      if (sy < -10 || sy > H()+10) return;
+      s.ph += s.twS;
+      const op = Math.max(0,Math.min(1,s.oBase*(1-s.twA*(0.5+0.5*Math.sin(s.ph)))));
+      const col = s.warm?`rgba(255,215,150,${op})`:s.cool?`rgba(180,210,255,${op})`:`rgba(235,242,255,${op})`;
+      if (s.glow&&s.r>1.5) {
+        const g=ctx.createRadialGradient(s.x,sy,0,s.x,sy,s.r*5);
+        g.addColorStop(0,s.warm?`rgba(255,200,100,${op*0.18})`:`rgba(200,220,255,${op*0.14})`);
+        g.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.beginPath();ctx.arc(s.x,sy,s.r*5,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();
+      }
+      ctx.beginPath();ctx.arc(s.x,sy,s.r,0,Math.PI*2);ctx.fillStyle=col;ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('scroll',()=>{scrollY=window.scrollY;},{passive:true});
+  (function tick(){smooth+=(scrollY-smooth)*0.07;requestAnimationFrame(tick);})();
+  resize(); init(); draw();
+  window.addEventListener('resize',()=>{resize();init();});
+  window.addEventListener('load',()=>{init();});
+
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }});
+  }, { threshold: 0.06 });
+  document.querySelectorAll('.ds-reveal').forEach(el => obs.observe(el));
+})();
+</script>
+{% endblock inline_javascript %}

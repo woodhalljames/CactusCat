@@ -1,0 +1,105 @@
+{% extends "account/base_entrance.html" %}
+{% load allauth i18n %}
+
+{% block head_title %}{% trans "Sign Up" %}{% endblock %}
+
+{% block content %}
+  {% element h1 %}{% trans "Sign Up" %}{% endelement %}
+
+  {% setvar link %}<a href="{{ login_url }}">{% endsetvar %}
+  {% setvar end_link %}</a>{% endsetvar %}
+  {% element p %}
+    {% blocktranslate %}Already have an account? Then please {{ link }}sign in{{ end_link }}.{% endblocktranslate %}
+  {% endelement %}
+
+  {% if not SOCIALACCOUNT_ONLY %}
+    {% url 'account_signup' as action_url %}
+    <form method="post" action="{{ action_url }}">
+      {% csrf_token %}
+      {{ redirect_field }}
+
+      <!-- Email + password fields -->
+      {% element fields form=form unlabeled=True %}{% endelement %}
+
+      <button type="submit" class="btn btn-primary w-100 mt-1">{% trans "Sign Up" %}</button>
+    </form>
+  {% endif %}
+
+  {% if SOCIALACCOUNT_ENABLED %}
+    {% include "socialaccount/snippets/login.html" with page_layout="entrance" %}
+  {% endif %}
+{% endblock content %}
+
+{% block inline_javascript %}
+{{ block.super }}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js" crossorigin="anonymous"></script>
+<script>
+(function () {
+  var p1 = document.getElementById('id_password1');
+  var p2 = document.getElementById('id_password2');
+  if (!p1) return;
+
+  var rules = [
+    {
+      id: 'pwLen',
+      label: 'At least 8 characters',
+      test: function (v) { return v.length >= 8; },
+    },
+    {
+      id: 'pwNumeric',
+      label: "Can't be entirely numbers",
+      test: function (v) { return v.length > 0 && !/^\d+$/.test(v); },
+    },
+    {
+      id: 'pwCommon',
+      label: "Can't be a commonly used password",
+      test: function (v) { return v.length >= 8 && zxcvbn(v).score >= 1; },
+    },
+    {
+      id: 'pwSimilar',
+      label: "Can't be too similar to your email",
+      test: function (v) {
+        var emailEl = document.getElementById('id_email');
+        if (!emailEl || !emailEl.value || v.length < 8) return false;
+        var local = emailEl.value.split('@')[0].toLowerCase();
+        return local.length < 4 || !v.toLowerCase().includes(local);
+      },
+    },
+    {
+      id: 'pwMatch',
+      label: 'Passwords match',
+      test: function (v) { return p2 && p2.value.length > 0 && v === p2.value; },
+    },
+  ];
+
+  // Build checklist and inject after password1 wrapper
+  var checklist = document.createElement('ul');
+  checklist.className = 'pw-checklist';
+  rules.forEach(function (r) {
+    var li = document.createElement('li');
+    li.id = r.id;
+    li.className = 'pw-check';
+    li.innerHTML = '<span class="pw-icon"></span><span>' + r.label + '</span>';
+    checklist.appendChild(li);
+  });
+  var p1Anchor = p1.closest('.mb-3') || p1.closest('.form-group') || p1.parentNode;
+  p1Anchor.insertAdjacentElement('afterend', checklist);
+
+  function updateChecklist() {
+    var v = p1.value;
+    rules.forEach(function (r) {
+      var el   = document.getElementById(r.id);
+      var icon = el.querySelector('.pw-icon');
+      var pass = r.test(v);
+      el.classList.toggle('pw-check--met', pass);
+      icon.textContent = pass ? '✓' : '';
+    });
+  }
+
+  p1.addEventListener('input', updateChecklist);
+  if (p2) p2.addEventListener('input', updateChecklist);
+  var emailEl = document.getElementById('id_email');
+  if (emailEl) emailEl.addEventListener('input', updateChecklist);
+})();
+</script>
+{% endblock %}

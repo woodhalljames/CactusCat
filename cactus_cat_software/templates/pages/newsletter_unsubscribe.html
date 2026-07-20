@@ -1,47 +1,145 @@
 {% extends "base.html" %}
-{% load static crispy_forms_tags %}
+{% load static %}
 
-{% block title %}Unsubscribe from Newsletter - Cactus Cat Software{% endblock %}
+{% block title %}Unsubscribe | Cactus Cat Software{% endblock %}
+
+{% block css %}
+{{ block.super }}
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,400&display=swap" rel="stylesheet">
+<style>
+  html { background: #0a0c1a; }
+  body { font-family: 'Space Grotesk', sans-serif; background: transparent !important; }
+  #pageStars { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; }
+  footer { background: transparent !important; position: relative; z-index: 1; }
+
+  .unsub-wrap {
+    min-height: calc(100vh - 80px);
+    display: flex; align-items: flex-start; justify-content: center;
+    padding: 72px 16px 100px;
+    position: relative; z-index: 1;
+  }
+
+  .unsub-card {
+    width: 100%; max-width: 480px;
+    border: 1px solid rgba(131,163,132,0.3);
+    background: rgba(10,12,26,0.75);
+    backdrop-filter: blur(10px);
+    padding: 40px;
+    position: relative;
+  }
+
+  .form-control {
+    background: rgba(245,242,234,0.04) !important;
+    border: 1px solid rgba(131,163,132,0.25) !important;
+    color: #f5f2ea !important;
+    border-radius: 0 !important;
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-size: 15px !important;
+    padding: 11px 14px !important;
+  }
+  .form-control:focus {
+    border-color: rgba(131,163,132,0.6) !important;
+    box-shadow: 0 0 0 3px rgba(131,163,132,0.07) !important;
+    background: rgba(245,242,234,0.06) !important;
+  }
+  .form-control::placeholder { color: rgba(245,242,234,0.28) !important; }
+  .form-label {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 10px !important; letter-spacing: 0.18em !important;
+    text-transform: uppercase !important; color: rgba(245,242,234,0.55) !important;
+    font-weight: 400 !important; margin-bottom: 8px !important;
+  }
+  .invalid-feedback { font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+  .is-invalid { border-color: rgba(224,92,106,0.5) !important; }
+  .btn { border-radius: 0 !important; }
+</style>
+{% endblock css %}
 
 {% block content %}
-<div class="container py-5">
-  <div class="row">
-    <div class="col-lg-6 mx-auto">
-      <div class="text-center mb-4">
-        <i class="bi bi-envelope-x" style="font-size: 4rem; color: var(--muted-text);"></i>
-        <h1 class="display-6 fw-bold mt-3">Unsubscribe from Newsletter</h1>
-        <p class="text-muted">We're sorry to see you go!</p>
+<canvas id="pageStars"></canvas>
+
+<div class="unsub-wrap">
+  <div class="unsub-card">
+    <span class="ds-corner ds-corner-tl"></span>
+    <span class="ds-corner ds-corner-tr"></span>
+    <span class="ds-corner ds-corner-bl"></span>
+    <span class="ds-corner ds-corner-br"></span>
+
+    <div style="margin-bottom:28px;">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:#83A384;">· Newsletter</span>
+      <h1 style="font-family:'Fraunces',serif;font-size:2rem;font-weight:700;color:#f5f2ea;letter-spacing:-0.02em;margin:8px 0 4px;">Unsubscribe.</h1>
+      <p style="font-family:'Space Grotesk',sans-serif;font-size:14px;color:rgba(245,242,234,0.45);margin:0;">Enter your email to stop receiving updates.</p>
+    </div>
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="mb-4">
+        <label class="form-label" for="id_email">Email address</label>
+        <input type="email" name="email" id="id_email" class="form-control" placeholder="you@example.com" required>
       </div>
+      <button type="submit" class="btn w-100" style="padding:11px;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:15px;border:1px solid rgba(224,92,106,0.4);color:rgba(224,92,106,0.85);background:rgba(224,92,106,0.06);">
+        Unsubscribe
+      </button>
+    </form>
 
-      <div class="card">
-        <div class="card-body p-4">
-          <p class="mb-4 text-muted">
-            Enter your email address below to unsubscribe from our newsletter.
-            You will no longer receive updates from Cactus Cat Software.
-          </p>
+    <div style="margin-top:24px;padding-top:20px;border-top:1px solid rgba(245,242,234,0.08);">
+      <p style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;color:rgba(245,242,234,0.3);margin:0;">
+        Changed your mind? You can resubscribe anytime from the footer.
+      </p>
+    </div>
 
-          {% crispy form %}
-
-          <div class="alert alert-info mt-4 mb-0">
-            <div class="d-flex align-items-start">
-              <i class="bi bi-info-circle me-2 mt-1" style="font-size: 1.2rem;"></i>
-              <div>
-                <strong>Changed your mind?</strong>
-                <p class="mb-0 mt-1 small">
-                  You can always resubscribe later in the footer of our website if you'd like to stay in touch.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="text-center mt-4">
-        <a href="{% url 'home' %}" class="btn btn-outline-primary">
-          <i class="bi bi-arrow-left me-2"></i>Back to Home
-        </a>
-      </div>
+    <div style="margin-top:16px;">
+      <a href="{% url 'home' %}" style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(245,242,234,0.3);text-decoration:none;">
+        ← Back to home
+      </a>
     </div>
   </div>
 </div>
-{% endblock %}
+{% endblock content %}
+
+{% block inline_javascript %}
+{{ block.super }}
+<script>
+(function () {
+  const canvas = document.getElementById('pageStars');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = () => window.innerWidth, H = () => window.innerHeight;
+  const STAR_COUNT = 180, BANDS = 3;
+  let stars = [], scrollY = 0, smooth = 0;
+  function resize() { canvas.width = W(); canvas.height = H(); }
+  function init() {
+    stars = [];
+    for (let i = 0; i < STAR_COUNT; i++) {
+      const d = Math.random();
+      stars.push({ x: Math.random()*W(), pageY: Math.random()*H()*BANDS, depth: d,
+        r: 0.15+d*d*2.6, oBase: 0.08+d*0.78, twA: 0.15+d*0.55,
+        twS: 0.0008+d*0.0035, ph: Math.random()*Math.PI*2,
+        warm: d>0.7&&Math.random()<0.18, cool: d>0.85&&Math.random()<0.12, glow: d>0.72 });
+    }
+  }
+  function draw() {
+    ctx.clearRect(0,0,W(),H());
+    stars.forEach(s => {
+      const pf = 0.05+s.depth*0.95, sy = s.pageY - smooth*pf;
+      if (sy < -10 || sy > H()+10) return;
+      s.ph += s.twS;
+      const op = Math.max(0,Math.min(1,s.oBase*(1-s.twA*(0.5+0.5*Math.sin(s.ph)))));
+      const col = s.warm?`rgba(255,215,150,${op})`:s.cool?`rgba(180,210,255,${op})`:`rgba(235,242,255,${op})`;
+      if (s.glow&&s.r>1.5) {
+        const g=ctx.createRadialGradient(s.x,sy,0,s.x,sy,s.r*5);
+        g.addColorStop(0,s.warm?`rgba(255,200,100,${op*0.18})`:`rgba(200,220,255,${op*0.14})`);
+        g.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.beginPath();ctx.arc(s.x,sy,s.r*5,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();
+      }
+      ctx.beginPath();ctx.arc(s.x,sy,s.r,0,Math.PI*2);ctx.fillStyle=col;ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener('scroll',()=>{scrollY=window.scrollY;},{passive:true});
+  (function tick(){smooth+=(scrollY-smooth)*0.07;requestAnimationFrame(tick);})();
+  resize(); init(); draw();
+  window.addEventListener('resize',()=>{resize();init();});
+})();
+</script>
+{% endblock inline_javascript %}

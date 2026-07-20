@@ -35,7 +35,15 @@ class Project(TimeStampedModel):
         on_delete=models.CASCADE,
         related_name="projects",
         verbose_name=_("Client"),
-        help_text="User who can view this project",
+        help_text="Primary client user for this project",
+    )
+
+    collaborators = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        related_name="collaborated_projects",
+        verbose_name=_("Additional Team Members"),
+        blank=True,
+        help_text="Other users who can view this project dashboard (e.g. client's team members)",
     )
 
     # Project Info
@@ -66,6 +74,47 @@ class Project(TimeStampedModel):
         blank=True,
     )
 
+    # Preview / Beta Access
+    preview_url = models.URLField(
+        _("Preview URL"),
+        blank=True,
+        help_text="Link to the current beta build on the VPS (e.g. http://123.45.67.89:8080)",
+    )
+    beta_username = models.CharField(
+        _("Beta Username"),
+        max_length=200,
+        blank=True,
+        help_text="Test account username for the beta site (visible to client)",
+    )
+    beta_password = models.CharField(
+        _("Beta Password"),
+        max_length=200,
+        blank=True,
+        help_text="Test account password for the beta site (visible to client)",
+    )
+
+    # Account Manager
+    account_manager_name = models.CharField(
+        _("Account Manager Name"),
+        max_length=200,
+        blank=True,
+    )
+    account_manager_title = models.CharField(
+        _("Account Manager Title"),
+        max_length=200,
+        blank=True,
+        help_text="e.g. Project Lead, Creative Director",
+    )
+    account_manager_email = models.EmailField(
+        _("Account Manager Email"),
+        blank=True,
+    )
+    account_manager_phone = models.CharField(
+        _("Account Manager Phone"),
+        max_length=50,
+        blank=True,
+    )
+
     # Notes
     status_notes = models.TextField(
         _("Status Notes"),
@@ -92,8 +141,56 @@ class Project(TimeStampedModel):
             self.slug = slug
         super().save(*args, **kwargs)
 
+    def get_service_slug(self):
+        if self.order.service_package:
+            return self.order.service_package.slug
+        first_item = self.order.items.first()
+        return first_item.service_package.slug if first_item else "project"
+
     def get_absolute_url(self):
-        return reverse("projects:detail", kwargs={"pk": self.pk})
+        return reverse(
+            "projects:detail",
+            kwargs={
+                "service_slug": self.get_service_slug(),
+                "order_number": self.order.order_number,
+            },
+        )
+
+
+class ProjectPhase(TimeStampedModel):
+    """A custom project phase created by the admin (e.g. Discovery, Architecture, QA)."""
+
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.CASCADE,
+        related_name="phases",
+        verbose_name=_("Project"),
+    )
+
+    name = models.CharField(
+        _("Phase Name"),
+        max_length=200,
+        help_text="e.g. Discovery, Scope Definition, Architecture, Development",
+    )
+    description = models.TextField(
+        _("Client Notes"),
+        blank=True,
+        help_text="Updates or notes visible to the client for this phase",
+    )
+    progress_percentage = models.IntegerField(
+        _("Progress %"),
+        default=0,
+        help_text="0–100. Admin sets this; client sees the progress bar.",
+    )
+    display_order = models.IntegerField(_("Display Order"), default=0)
+
+    class Meta:
+        verbose_name = _("Project Phase")
+        verbose_name_plural = _("Project Phases")
+        ordering = ["display_order", "created"]
+
+    def __str__(self):
+        return f"{self.project.project_name} — {self.name}"
 
 
 class ProjectUpdate(TimeStampedModel):
@@ -104,6 +201,16 @@ class ProjectUpdate(TimeStampedModel):
         on_delete=models.CASCADE,
         related_name="updates",
         verbose_name=_("Project"),
+    )
+
+    phase = models.ForeignKey(
+        ProjectPhase,
+        on_delete=models.SET_NULL,
+        related_name="updates",
+        verbose_name=_("Phase"),
+        null=True,
+        blank=True,
+        help_text="Link to a specific project phase (optional)",
     )
 
     title = models.CharField(_("Update Title"), max_length=200)
@@ -158,6 +265,13 @@ class ProjectInvoice(TimeStampedModel):
         blank=True,
     )
 
+    # Payment link (e.g. PayPal, Stripe, Square, etc.)
+    payment_url = models.URLField(
+        _("Payment Link"),
+        blank=True,
+        help_text="Optional external payment link (PayPal, Stripe, Square, etc.)",
+    )
+
     # Files
     invoice_file = models.FileField(
         _("Invoice PDF"),
@@ -191,6 +305,15 @@ class ProjectItem(TimeStampedModel):
         verbose_name=_("Project"),
     )
 
+    phase = models.ForeignKey(
+        "ProjectPhase",
+        on_delete=models.SET_NULL,
+        related_name="items",
+        verbose_name=_("Phase"),
+        null=True,
+        blank=True,
+    )
+
     # Item details
     name = models.CharField(_("Item Name"), max_length=200)
     description = models.TextField(_("Description"), blank=True)
@@ -217,6 +340,79 @@ class ProjectItem(TimeStampedModel):
         return f"{self.project.project_name} - {self.name}"
 
 
+class ProjectQuestion(TimeStampedModel):
+    """A question the admin posts for the client to answer within a phase."""
+
+    TYPE_CHOICES = [
+        ("text", _("Free Text")),
+        ("confirm", _("Confirm / Acknowledge")),
+        ("choice", _("Select from Options")),
+    ]
+
+    STATUS_CHOICES = [
+        ("pending", _("Awaiting Response")),
+        ("answered", _("Answered")),
+    ]
+
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.CASCADE,
+        related_name="questions",
+        verbose_name=_("Project"),
+    )
+
+    phase = models.ForeignKey(
+        ProjectPhase,
+        on_delete=models.CASCADE,
+        related_name="questions",
+        verbose_name=_("Phase"),
+        null=True,
+        blank=True,
+        help_text="Which phase this question belongs to",
+    )
+
+    question = models.TextField(_("Question"), help_text="The question or instruction shown to the client")
+    question_type = models.CharField(
+        _("Question Type"),
+        max_length=10,
+        choices=TYPE_CHOICES,
+        default="text",
+        help_text="Free Text = client writes an answer. Confirm = client ticks a checkbox. Choice = client picks from a list.",
+    )
+    choices = models.TextField(
+        _("Options"),
+        blank=True,
+        help_text="For 'Select from Options' type only — one option per line (e.g. brand slogans, language tones).",
+    )
+
+    # Optional media/doc the admin attaches to provide context
+    attachment = models.FileField(
+        _("Attachment"),
+        upload_to="project_questions/",
+        blank=True,
+        help_text="Optional image, PDF, or document the client should review before answering",
+    )
+
+    display_order = models.IntegerField(_("Display Order"), default=0)
+
+    # Client response
+    answer = models.TextField(_("Client Answer"), blank=True)
+    answered_at = models.DateTimeField(_("Answered At"), null=True, blank=True)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="pending")
+
+    class Meta:
+        verbose_name = _("Project Question")
+        verbose_name_plural = _("Project Questions")
+        ordering = ["display_order", "created"]
+
+    def __str__(self):
+        return f"{self.project.project_name} — Q: {self.question[:60]}"
+
+    def get_choices_list(self):
+        """Return choices as a list of stripped strings."""
+        return [c.strip() for c in self.choices.splitlines() if c.strip()]
+
+
 class ProjectNote(TimeStampedModel):
     """Notes and comments for project communication."""
 
@@ -227,7 +423,16 @@ class ProjectNote(TimeStampedModel):
         verbose_name=_("Project"),
     )
 
-    # Optional link to specific item
+    # Optional link to phase or specific item
+    phase = models.ForeignKey(
+        "ProjectPhase",
+        on_delete=models.SET_NULL,
+        related_name="notes",
+        verbose_name=_("Phase"),
+        null=True,
+        blank=True,
+    )
+
     item = models.ForeignKey(
         ProjectItem,
         on_delete=models.CASCADE,
@@ -300,6 +505,15 @@ class ProjectMilestone(TimeStampedModel):
         verbose_name=_("Project"),
     )
 
+    phase = models.ForeignKey(
+        "ProjectPhase",
+        on_delete=models.SET_NULL,
+        related_name="milestones",
+        verbose_name=_("Phase"),
+        null=True,
+        blank=True,
+    )
+
     # Milestone details
     name = models.CharField(_("Milestone Name"), max_length=200)
     description = models.TextField(_("Description"), blank=True)
@@ -340,6 +554,15 @@ class ProjectApproval(TimeStampedModel):
         on_delete=models.CASCADE,
         related_name="approvals",
         verbose_name=_("Project"),
+    )
+
+    phase = models.ForeignKey(
+        "ProjectPhase",
+        on_delete=models.SET_NULL,
+        related_name="approvals",
+        verbose_name=_("Phase"),
+        null=True,
+        blank=True,
     )
 
     # Approval details

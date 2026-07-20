@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Sign Out | Cactus Cat Software{% endblock %}
+{% block meta_description %}Sign out of your Cactus Cat Software account.{% endblock %}
+
+{% block css %}
+{{ block.super }}
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,400&display=swap" rel="stylesheet">
+<style>
+  html { background: #0a0c1a; }
+  body { font-family: 'Space Grotesk', sans-serif; background: transparent !important; }
+
+  #pageStars { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; }
+
+  footer { background: transparent !important; position: relative; z-index: 1; }
+
+  .logout-wrap {
+    padding: 80px 0 120px;
+    position: relative; z-index: 1;
+    min-height: calc(100vh - 80px);
+    display: flex; align-items: center;
+  }
+
+  .logout-grid {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 48px;
+    align-items: start;
+  }
+
+  @media (max-width: 991px) {
+    .logout-grid { grid-template-columns: 1fr; gap: 32px; }
+  }
+</style>
+{% endblock css %}
+
+{% block content %}
+<canvas id="pageStars"></canvas>
+
+<div class="logout-wrap">
+  <div class="container">
+
+    <div style="margin-bottom:48px;">
+      <span class="ds-eyebrow">· Session</span>
+      <h1 class="ds-display" style="font-size:clamp(3rem,6vw,5.5rem);margin:8px 0 0;max-width:700px;">
+        Ready to<br><em style="font-style:italic;color:#83A384;">sign out?</em>
+      </h1>
+    </div>
+
+    <div class="logout-grid">
+
+      <!-- Left: info panel -->
+      <div>
+        <div style="position:relative;border:1px solid rgba(131,163,132,0.3);padding:24px;background:rgba(10,12,26,0.5);">
+          <span class="ds-corner ds-corner-tl"></span>
+          <span class="ds-corner ds-corner-tr"></span>
+          <span class="ds-corner ds-corner-bl"></span>
+          <span class="ds-corner ds-corner-br"></span>
+
+          <span class="ds-eyebrow" style="margin-bottom:16px;">· Field station</span>
+
+          <div style="display:flex;flex-direction:column;gap:16px;margin-bottom:20px;">
+            <div>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(245,242,234,0.4);display:block;margin-bottom:4px;">· Account</span>
+              <div style="font-family:'Space Grotesk',sans-serif;font-size:15px;color:rgba(245,242,234,0.85);">{{ request.user.email }}</div>
+            </div>
+            <div>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(245,242,234,0.4);display:block;margin-bottom:4px;">· Status</span>
+              <div style="font-family:'Space Grotesk',sans-serif;font-size:15px;color:rgba(245,242,234,0.85);">Active session</div>
+            </div>
+          </div>
+
+          <div style="border-top:1px solid rgba(245,242,234,0.1);padding-top:16px;">
+            <p class="ds-body" style="font-size:13px;margin:0;color:rgba(245,242,234,0.55);">
+              You can sign back in at any time. Your dashboard and project data stay right where you left them.
+            </p>
+          </div>
+        </div>
+
+        <div style="margin-top:16px;padding:12px 0;border-top:1px solid rgba(245,242,234,0.1);">
+          <p class="ds-body" style="font-size:13px;margin:0;color:rgba(245,242,234,0.45);">
+            Changed your mind?
+            <a href="{% url 'projects:dashboard' %}" class="ds-link" style="font-size:13px;">Back to dashboard →</a>
+          </p>
+        </div>
+      </div>
+
+      <!-- Right: confirm panel -->
+      <div>
+        <div style="position:relative;border:1px solid rgba(131,163,132,0.3);padding:24px;background:rgba(10,12,26,0.5);">
+          <span class="ds-corner ds-corner-tl"></span>
+          <span class="ds-corner ds-corner-tr"></span>
+          <span class="ds-corner ds-corner-bl"></span>
+          <span class="ds-corner ds-corner-br"></span>
+
+          <span class="ds-eyebrow" style="margin-bottom:16px;">· Confirm sign-out</span>
+
+          <p class="ds-body" style="font-size:16px;margin:0 0 28px;color:rgba(245,242,234,0.7);">
+            You're about to end your current session. Confirm below to sign out securely.
+          </p>
+
+          <form method="post" action="{% url 'account_logout' %}">
+            {% csrf_token %}
+            {{ redirect_field }}
+            <button type="submit" class="ds-btn-solid">Sign out →</button>
+            <a href="javascript:history.back()" class="ds-btn" style="display:inline-flex;margin-top:12px;">Cancel</a>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block inline_javascript %}
+{{ block.super }}
+<script>
+(function () {
+  const canvas = document.getElementById('pageStars');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = () => window.innerWidth, H = () => window.innerHeight;
+  const STAR_COUNT = 260, BANDS = 5;
+  let stars = [], scrollY = 0, smooth = 0;
+  function resize() { canvas.width = W(); canvas.height = H(); }
+  function init() {
+    stars = [];
+    for (let i = 0; i < STAR_COUNT; i++) {
+      const d = Math.random();
+      stars.push({ x: Math.random()*W(), pageY: Math.random()*H()*BANDS, depth: d,
+        r: 0.15+d*d*2.6, oBase: 0.08+d*0.78, twA: 0.15+d*0.55,
+        twS: 0.0008+d*0.0035, ph: Math.random()*Math.PI*2,
+        warm: d>0.7&&Math.random()<0.18, cool: d>0.85&&Math.random()<0.12, glow: d>0.72 });
+    }
+  }
+  function draw() {
+    ctx.clearRect(0,0,W(),H());
+    stars.forEach(s => {
+      const pf = 0.05+s.depth*0.95, sy = s.pageY - smooth*pf;
+      if (sy < -10 || sy > H()+10) return;
+      s.ph += s.twS;
+      const op = Math.max(0,Math.min(1,s.oBase*(1-s.twA*(0.5+0.5*Math.sin(s.ph)))));
+      const col = s.warm?`rgba(255,215,150,${op})`:s.cool?`rgba(180,210,255,${op})`:`rgba(235,242,255,${op})`;
+      if (s.glow&&s.r>1.5) {
+        const g=ctx.createRadialGradient(s.x,sy,0,s.x,sy,s.r*5);
+        g.addColorStop(0,s.warm?`rgba(255,200,100,${op*0.18})`:`rgba(200,220,255,${op*0.14})`);
+        g.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.beginPath();ctx.arc(s.x,sy,s.r*5,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();
+      }
+      ctx.beginPath();ctx.arc(s.x,sy,s.r,0,Math.PI*2);ctx.fillStyle=col;ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener('scroll',()=>{scrollY=window.scrollY;},{passive:true});
+  (function tick(){smooth+=(scrollY-smooth)*0.07;requestAnimationFrame(tick);})();
+  resize(); init(); draw();
+  window.addEventListener('resize',()=>{resize();init();});
+})();
+</script>
+{% endblock inline_javascript %}

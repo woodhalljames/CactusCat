@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cactus Cat — Home / Splash Redesign</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,300;1,9..144,400;1,9..144,600&display=swap" rel="stylesheet">
+<style>
+  html, body { margin:0; padding:0; background:#f0eee9; overflow:hidden; }
+  body { font-family: 'Space Grotesk', system-ui, sans-serif; }
+  #root { width:100vw; height:100vh; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel" src="data.jsx"></script>
+<script type="text/babel" src="variant-broadsheet.jsx"></script>
+<script type="text/babel" src="variant-monograph.jsx"></script>
+<script type="text/babel" src="variant-dispatch.jsx"></script>
+
+<script type="text/babel">
+  // Wait for all dependencies (Babel transpiles each <script src> separately
+  // and there's no guarantee of order, so poll briefly).
+  function ready() {
+    return window.DesignCanvas && window.DCSection && window.DCArtboard
+      && window.VariantBroadsheet && window.VariantMonograph && window.VariantDispatch;
+  }
+
+  function boot() {
+    const { DesignCanvas, DCSection, DCArtboard } = window;
+    const { VariantBroadsheet, VariantMonograph, VariantDispatch } = window;
+
+    const W = 1440;
+    const H = 5400;
+
+    function App() {
+      return (
+        <DesignCanvas>
+          <DCSection
+            id="home-splash"
+            title="Home / Splash — Three editorial directions"
+            subtitle="Same content & flow. Desert night theme preserved. Pick what feels right — or remix across them."
+          >
+            <DCArtboard id="broadsheet" label="A · The Broadsheet" width={W} height={H}>
+              <VariantBroadsheet />
+            </DCArtboard>
+            <DCArtboard id="monograph" label="B · The Monograph" width={W} height={H + 800}>
+              <VariantMonograph />
+            </DCArtboard>
+            <DCArtboard id="dispatch" label="C · The Dispatch" width={W} height={H}>
+              <VariantDispatch />
+            </DCArtboard>
+          </DCSection>
+        </DesignCanvas>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  }
+
+  (function wait(){
+    if (ready()) boot();
+    else setTimeout(wait, 50);
+  })();
+</script>
+</body>
+</html>

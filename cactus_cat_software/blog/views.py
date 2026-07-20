@@ -1,3 +1,4 @@
+from django.db.models import F
 from django.views.generic import DetailView, ListView
 
 from .models import BlogPost
@@ -9,13 +10,12 @@ class BlogListView(ListView):
     model = BlogPost
     template_name = "blog/post_list.html"
     context_object_name = "posts"
-    paginate_by = 9
+    paginate_by = 12
 
     def get_queryset(self):
         return (
             BlogPost.objects.filter(status="published")
-            .select_related("author")
-            .order_by("-published_date")
+            .order_by(F("published_date").desc(nulls_last=True), "-created")
         )
 
 

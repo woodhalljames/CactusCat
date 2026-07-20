@@ -14,10 +14,12 @@ class CheckoutForm(forms.ModelForm):
             "customer_name",
             "customer_email",
             "customer_phone",
-            "company_name",
+            "timeline",
+            "budget_range",
             "custom_requirements",
         ]
         widgets = {
+            "budget_range": forms.TextInput(attrs={"placeholder": "e.g. $5,000 – $10,000 or open to discussion"}),
             "custom_requirements": forms.Textarea(attrs={"rows": 4}),
         }
 
@@ -38,8 +40,9 @@ class CheckoutForm(forms.ModelForm):
             ),
             Row(
                 Column("customer_phone", css_class="form-group col-md-6 mb-3"),
-                Column("company_name", css_class="form-group col-md-6 mb-3"),
+                Column("timeline", css_class="form-group col-md-6 mb-3"),
             ),
+            "budget_range",
             "custom_requirements",
-            Submit("submit", "Place Order", css_class="btn btn-primary btn-lg"),
+            Submit("submit", "Send Quote Request", css_class="btn btn-primary btn-lg"),
         )

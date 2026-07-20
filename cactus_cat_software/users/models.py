@@ -1,6 +1,8 @@
 
+import uuid
 from typing import ClassVar
 
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import CharField
@@ -26,15 +28,23 @@ class User(AbstractUser):
     email = EmailField(_("email address"), unique=True)
     username = None  # type: ignore[assignment]
 
+    ACCOUNT_TYPE_CHOICES = [
+        ("student", _("Student")),
+        ("business_applicant", _("Business — Pending Approval")),
+        ("business", _("Business")),
+    ]
+
+    account_type = CharField(
+        _("Account Type"),
+        max_length=20,
+        choices=ACCOUNT_TYPE_CHOICES,
+        default="student",
+    )
+
     # Business information
     company_name = CharField(_("Company Name"), blank=True, max_length=255)
     phone_number = CharField(_("Phone Number"), blank=True, max_length=20)
     website = CharField(_("Website"), blank=True, max_length=255)
-    additional_contacts = models.TextField(
-        _("Additional Contacts"),
-        blank=True,
-        help_text="Additional contact information (e.g., team members, alternative emails)",
-    )
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
@@ -49,6 +59,35 @@ class User(AbstractUser):
 
         """
         return reverse("projects:dashboard")
+
+
+class AccountInvite(TimeStampedModel):
+    """Invite a coworker to share access to the account dashboard."""
+
+    inviter = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="sent_invites",
+    )
+    email = models.EmailField(_("Invited Email"))
+    token = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    accepted = models.BooleanField(default=False)
+    accepted_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="received_invites",
+    )
+
+    class Meta:
+        verbose_name = _("Account Invite")
+        verbose_name_plural = _("Account Invites")
+        unique_together = [("inviter", "email")]
+        ordering = ["-created"]
+
+    def __str__(self):
+        return f"Invite from {self.inviter.email} to {self.email}"
 
 
 class NewsletterSubscriber(TimeStampedModel):

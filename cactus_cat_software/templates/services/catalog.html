@@ -1,43 +1,425 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Our Services{% endblock %}
+{% block title %}Services | Cactus Cat Software{% endblock %}
+{% block meta_description %}Browse our full catalog of custom software development, automation & AI systems, technical marketing, and infrastructure & cybersecurity services. Fixed price, fixed timeline and owned by you.{% endblock %}
+
+{% block css %}
+{{ block.super }}
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,400&display=swap" rel="stylesheet">
+<style>
+  html { background: #0a0c1a; }
+  body { font-family: 'Space Grotesk', sans-serif; background: transparent !important; }
+  #pageStars { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; }
+  footer { background: transparent !important; position: relative; z-index: 1; }
+
+  /* ── Header ─────────────────────────────────────────────── */
+  .catalog-header {
+    padding: 72px 0 56px;
+    position: relative; z-index: 1;
+    display: flex; justify-content: space-between; align-items: flex-end;
+    border-bottom: 1px solid rgba(245,242,234,0.12);
+    margin-bottom: 0;
+  }
+
+  /* ── Category Nav ────────────────────────────────────────── */
+  .cat-nav {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(10,12,26,0.88);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(131,163,132,0.12);
+    padding: 12px 0;
+  }
+
+  .cat-nav-inner {
+    display: flex; gap: 6px; align-items: center;
+    overflow-x: auto; scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .cat-nav-inner::-webkit-scrollbar { display: none; }
+
+  .cat-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 16px;
+    border: 1px solid rgba(131,163,132,0.2);
+    background: transparent;
+    color: rgba(245,242,234,0.55);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+    white-space: nowrap; cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .cat-pill:hover { border-color: #83A384; color: #f5f2ea; text-decoration: none; }
+  .cat-pill.active { border-color: #83A384; background: rgba(131,163,132,0.12); color: #83A384; }
+  .cat-pill i { font-size: 0.85rem; }
+
+  .nav-contact-link {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.12em;
+    color: rgba(245,242,234,0.4);
+    text-decoration: none; white-space: nowrap;
+    margin-left: auto; flex-shrink: 0;
+    transition: color 0.2s;
+  }
+  .nav-contact-link:hover { color: #83A384; text-decoration: none; }
+
+  /* ── Main layout ─────────────────────────────────────────── */
+  .catalog-body-wrap {
+    padding: 56px 0 80px;
+    position: relative; z-index: 1;
+  }
+
+  .cat-section { margin-bottom: 64px; scroll-margin-top: 70px; }
+
+  .cat-section-header {
+    display: flex; align-items: flex-end; gap: 24px;
+    margin-bottom: 32px; padding-bottom: 20px;
+    border-bottom: 1px solid rgba(131,163,132,0.15);
+  }
+
+  .cat-section-header h2 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(1.5rem, 2.5vw, 2rem);
+    font-weight: 600; color: #f5f2ea;
+    letter-spacing: -0.02em; margin: 0;
+  }
+
+  .cat-section-header p { font-size: 14px; color: rgba(245,242,234,0.45); margin: 0; }
+
+  /* ── Service Card ────────────────────────────────────────── */
+  .svc-card {
+    position: relative;
+    border: 1px solid rgba(131,163,132,0.22);
+    background: rgba(10,12,26,0.65);
+    backdrop-filter: blur(6px);
+    display: flex; flex-direction: column; height: 100%;
+    transition: border-color 0.25s, background 0.25s;
+  }
+  .svc-card:hover { border-color: rgba(131,163,132,0.5); background: rgba(10,12,26,0.8); }
+
+  .svc-ribbon {
+    position: absolute; top: 14px; right: 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase;
+    padding: 3px 8px;
+    border: 1px solid rgba(131,163,132,0.3);
+    color: #83A384;
+    z-index: 2;
+  }
+
+  .svc-card-top { padding: 28px 28px 20px; flex: 1; }
+
+  .svc-card-icon {
+    width: 40px; height: 40px;
+    border: 1px solid rgba(131,163,132,0.3);
+    background: rgba(131,163,132,0.06);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; color: #83A384;
+    margin-bottom: 20px;
+  }
+
+  .svc-card h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 1.15rem; font-weight: 600; color: #f5f2ea;
+    letter-spacing: -0.01em; margin-bottom: 8px;
+  }
+
+  .svc-card-desc { font-size: 14px; color: rgba(245,242,234,0.55); line-height: 1.65; margin-bottom: 14px; }
+
+  .svc-features-mini { display: flex; flex-direction: column; gap: 5px; margin-top: 12px; }
+  .svc-feature-mini {
+    display: flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.06em;
+    color: rgba(131,163,132,0.7);
+  }
+  .svc-feature-mini i { font-size: 9px; flex-shrink: 0; }
+
+  .svc-card-footer {
+    padding: 18px 28px;
+    border-top: 1px solid rgba(131,163,132,0.1);
+    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(10,12,26,0.3);
+  }
+
+  .delivery-chip {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; letter-spacing: 0.1em;
+    color: rgba(245,242,234,0.35);
+    display: flex; align-items: center; gap: 5px;
+  }
+
+  .svc-card-btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+    padding: 8px 16px;
+    border: 1px solid rgba(131,163,132,0.3);
+    color: rgba(245,242,234,0.7);
+    background: transparent;
+    text-decoration: none;
+    transition: all 0.2s;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .svc-card-btn:hover { border-color: #83A384; color: #f5f2ea; text-decoration: none; }
+  .svc-card-btn--cta {
+    background: rgba(131,163,132,0.12);
+    border-color: #83A384; color: #83A384;
+  }
+  .svc-card-btn--cta:hover { background: #83A384; color: #0a0c1a; }
+
+  /* ── Empty state ─────────────────────────────────────────── */
+  .catalog-empty { text-align: center; padding: 80px 0; }
+
+  /* ── CTA strip ───────────────────────────────────────────── */
+  .catalog-cta {
+    border-top: 1px solid rgba(245,242,234,0.1);
+    padding: 72px 0;
+    position: relative; z-index: 1;
+  }
+
+  /* ── Scroll reveal ───────────────────────────────────────── */
+  .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal-d1 { transition-delay: 0.05s; }
+  .reveal-d2 { transition-delay: 0.10s; }
+  .reveal-d3 { transition-delay: 0.15s; }
+  .reveal-d4 { transition-delay: 0.20s; }
+
+  @media (max-width: 768px) {
+    .catalog-header { flex-direction: column; align-items: flex-start; gap: 16px; }
+    .svc-card-footer { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .svc-card-btn { width: 100%; text-align: center; }
+  }
+</style>
+{% endblock css %}
 
 {% block content %}
-<div class="container py-5">
-  <div class="text-center mb-5">
-    <h1 class="display-4 fw-bold">Services</h1>
-    <p class="lead text-muted">Professional solutions tailored to your needs</p>
-  </div>
+<canvas id="pageStars"></canvas>
 
-  {% for category in categories %}
-    <section class="mb-5">
-      <div class="d-flex align-items-center mb-4">
-        {% if category.icon %}
-          <i class="bi {{ category.icon }} me-3" style="font-size: 2rem; color: var(--accent-green);"></i>
-        {% endif %}
-        <div>
-          <h2 class="mb-1">{{ category.name }}</h2>
-          {% if category.description %}
-            <p class="text-muted mb-0">{{ category.description }}</p>
-          {% endif %}
-        </div>
+<!-- Header -->
+<div style="position:relative;z-index:1;">
+  <div class="container">
+    <div class="catalog-header reveal">
+      <div>
+        <span class="ds-eyebrow"></span>
+        <h1 class="ds-display" style="font-size:clamp(3rem,6vw,5.5rem);margin:8px 0 0;">
+          Services &amp;<br><em style="font-style:italic;color:#83A384;">Solutions.</em>
+        </h1>
       </div>
-
-      <div class="row g-4">
-        {% for package in packages %}
-          {% if package.category == category %}
-            {% include "services/includes/service_card.html" with service=package %}
-          {% endif %}
-        {% endfor %}
-      </div>
-    </section>
-  {% endfor %}
-
-  {% if not categories %}
-    <div class="text-center py-5">
-      <p class="text-muted">No services available at the moment. Please check back later.</p>
+      <p class="ds-coord" style="max-width:300px;text-align:right;margin:0;">
+        · Every engagement is fixed-fee, fixed-timeline, and owned by you.
+      </p>
     </div>
-  {% endif %}
+  </div>
 </div>
-{% endblock %}
+
+<!-- Category nav -->
+{% if categories %}
+<div class="cat-nav">
+  <div class="container">
+    <div class="cat-nav-inner">
+      <a href="#all" class="cat-pill active" data-target="all">
+        <i class="bi bi-grid-3x3-gap"></i> All
+      </a>
+      {% for category in categories %}
+        <a href="#cat-{{ category.id }}" class="cat-pill" data-target="cat-{{ category.id }}">
+          {% if category.icon %}<i class="bi {{ category.icon }}"></i>{% endif %}
+          {{ category.name }}
+        </a>
+      {% endfor %}
+      <div style="width:1px;height:18px;background:rgba(131,163,132,0.15);flex-shrink:0;margin:0 4px;"></div>
+      <a href="{% url 'contact' %}" class="nav-contact-link">
+        Not sure? → Talk to us
+      </a>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- Main content -->
+<div class="catalog-body-wrap">
+  <div class="container">
+
+    {% if categories %}
+      {% for category in categories %}
+        <section class="cat-section reveal" id="cat-{{ category.id }}">
+
+          <div class="cat-section-header">
+            <div style="width:40px;height:40px;border:1px solid rgba(131,163,132,0.3);background:rgba(131,163,132,0.06);display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:#83A384;flex-shrink:0;">
+              {% if category.icon %}<i class="bi {{ category.icon }}"></i>{% else %}<i class="bi bi-box"></i>{% endif %}
+            </div>
+            <div>
+              <h2>{{ category.name }}</h2>
+              {% if category.description %}<p>{{ category.description }}</p>{% endif %}
+            </div>
+          </div>
+
+          <div class="row g-3">
+            {% for package in packages %}
+              {% if package.category == category %}
+                <div class="col-md-6 col-xl-4 reveal reveal-d{{ forloop.counter }}">
+                  <div class="svc-card">
+
+                    {% if forloop.first %}<div class="svc-ribbon">Popular</div>{% endif %}
+
+                    <div class="svc-card-top">
+                      <div class="svc-card-icon">
+                        {% if package.icon %}<i class="bi {{ package.icon }}"></i>
+                        {% elif category.icon %}<i class="bi {{ category.icon }}"></i>
+                        {% else %}<i class="bi bi-box"></i>{% endif %}
+                      </div>
+                      <h3>{{ package.name }}</h3>
+                      <p class="svc-card-desc">{{ package.short_description }}</p>
+                      {% if package.features %}
+                        <div class="svc-features-mini">
+                          {% for feature in package.get_features_list|slice:":3" %}
+                            <div class="svc-feature-mini">
+                              <i class="bi bi-check-circle-fill" style="color:#83A384;"></i>
+                              {{ feature }}
+                            </div>
+                          {% endfor %}
+                        </div>
+                      {% endif %}
+                    </div>
+
+                    <div class="svc-card-footer">
+                      <div>
+                        {% if package.estimated_delivery_days %}
+                          <div class="delivery-chip">
+                            <i class="bi bi-clock"></i> Est. {{ package.estimated_delivery_days }} days
+                          </div>
+                        {% endif %}
+                      </div>
+                      <div style="display:flex;gap:8px;align-items:center;">
+                        <a href="{% url 'services:detail' package.slug %}" class="svc-card-btn">Details</a>
+                        <form method="post" action="{% url 'orders:cart_add' package.id %}" class="add-to-cart-form">
+                          {% csrf_token %}
+                          <button type="submit" class="svc-card-btn svc-card-btn--cta">
+                            + Quote
+                          </button>
+                        </form>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+
+        </section>
+      {% endfor %}
+
+    {% else %}
+      <div class="catalog-empty">
+        <span class="ds-eyebrow" style="display:block;margin-bottom:16px;">· No services logged yet</span>
+        <p class="ds-body" style="margin-bottom:24px;font-size:16px;">
+          Check back soon, or <a href="{% url 'contact' %}" class="ds-link">get in touch</a> to discuss what you need.
+        </p>
+      </div>
+    {% endif %}
+
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="catalog-cta">
+  <div class="container text-center">
+    <span class="ds-eyebrow" style="display:block;margin-bottom:14px;">· Not sure where to start?</span>
+    <h2 class="ds-display" style="font-size:clamp(2rem,4vw,3.5rem);margin-bottom:20px;">
+      Let's talk through<br>your project.
+    </h2>
+    <p class="ds-body" style="font-size:16px;margin:0 auto 32px;max-width:420px;">
+      Every engagement starts with a conversation; no commitment required.
+    </p>
+    <a href="{% url 'contact' %}" class="ds-btn-solid">Open a commission →</a>
+  </div>
+</div>
+
+{% endblock content %}
+
+{% block inline_javascript %}
+{{ block.super }}
+<script>
+(function () {
+  /* Starfield */
+  const canvas = document.getElementById('pageStars');
+  if (canvas) {
+    const ctx = canvas.getContext('2d');
+    const W = () => window.innerWidth, H = () => window.innerHeight;
+    const STAR_COUNT = 280, BANDS = 6;
+    let stars = [], scrollY = 0, smooth = 0;
+    function resize() { canvas.width = W(); canvas.height = H(); }
+    function init() {
+      stars = [];
+      for (let i = 0; i < STAR_COUNT; i++) {
+        const d = Math.random();
+        stars.push({ x: Math.random()*W(), pageY: Math.random()*H()*BANDS, depth: d,
+          r: 0.15+d*d*2.6, oBase: 0.08+d*0.78, twA: 0.15+d*0.55,
+          twS: 0.0008+d*0.0035, ph: Math.random()*Math.PI*2,
+          warm: d>0.7&&Math.random()<0.18, cool: d>0.85&&Math.random()<0.12, glow: d>0.72 });
+      }
+    }
+    function draw() {
+      ctx.clearRect(0,0,W(),H());
+      stars.forEach(s => {
+        const pf = 0.05+s.depth*0.95, sy = s.pageY - smooth*pf;
+        if (sy < -10 || sy > H()+10) return;
+        s.ph += s.twS;
+        const op = Math.max(0,Math.min(1,s.oBase*(1-s.twA*(0.5+0.5*Math.sin(s.ph)))));
+        const col = s.warm?`rgba(255,215,150,${op})`:s.cool?`rgba(180,210,255,${op})`:`rgba(235,242,255,${op})`;
+        if (s.glow&&s.r>1.5) {
+          const g=ctx.createRadialGradient(s.x,sy,0,s.x,sy,s.r*5);
+          g.addColorStop(0,s.warm?`rgba(255,200,100,${op*0.18})`:`rgba(200,220,255,${op*0.14})`);
+          g.addColorStop(1,'rgba(0,0,0,0)');
+          ctx.beginPath();ctx.arc(s.x,sy,s.r*5,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();
+        }
+        ctx.beginPath();ctx.arc(s.x,sy,s.r,0,Math.PI*2);ctx.fillStyle=col;ctx.fill();
+      });
+      requestAnimationFrame(draw);
+    }
+    window.addEventListener('scroll',()=>{scrollY=window.scrollY;},{passive:true});
+    (function tick(){smooth+=(scrollY-smooth)*0.07;requestAnimationFrame(tick);})();
+    resize(); init(); draw();
+    window.addEventListener('resize',()=>{resize();init();});
+  }
+
+  /* Scroll reveal */
+  const ro = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); ro.unobserve(e.target); }});
+  }, { threshold: 0.06 });
+  document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
+
+  /* Category pill navigation */
+  const pills = document.querySelectorAll('.cat-pill');
+  pills.forEach(pill => {
+    pill.addEventListener('click', e => {
+      e.preventDefault();
+      const target = pill.dataset.target;
+      pills.forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      if (target === 'all') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        const section = document.getElementById(target);
+        if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+
+  /* Pill highlight on scroll */
+  const sections = document.querySelectorAll('.cat-section');
+  const sObs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const id = e.target.id;
+        pills.forEach(p => { p.classList.toggle('active', p.dataset.target === id); });
+      }
+    });
+  }, { rootMargin: '-30% 0px -60% 0px' });
+  sections.forEach(s => sObs.observe(s));
+})();
+</script>
+{% endblock inline_javascript %}

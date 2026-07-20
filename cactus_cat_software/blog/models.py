@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -16,13 +15,7 @@ class BlogPost(TimeStampedModel):
     # Basic Info
     title = models.CharField(_("Title"), max_length=200)
     slug = models.SlugField(unique=True)
-    author = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name="blog_posts",
-        verbose_name=_("Author"),
-    )
+    author = models.CharField(_("Author"), max_length=100, blank=True, default="")
 
     # Content
     excerpt = models.TextField(
@@ -68,7 +61,7 @@ class BlogPost(TimeStampedModel):
     class Meta:
         verbose_name = _("Blog Post")
         verbose_name_plural = _("Blog Posts")
-        ordering = ["-published_date", "-created"]
+        ordering = ["-published_date", "-created"]  # nulls_last applied in views
         indexes = [
             models.Index(fields=["-published_date", "status"]),
         ]

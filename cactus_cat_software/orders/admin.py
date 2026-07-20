@@ -1,6 +1,5 @@
 from django.contrib import admin
 from django.contrib import messages
-from django.utils.html import format_html
 
 from .models import Order, OrderItem
 
@@ -25,10 +24,9 @@ class OrderAdmin(admin.ModelAdmin):
         "customer_email",
         "service_package",
         "total_amount",
-        "status_badge",
         "created",
     ]
-    list_filter = ["status", "created", "service_package__category"]
+    list_filter = ["created", "service_package__category"]
     search_fields = [
         "order_number",
         "customer_email",
@@ -37,13 +35,13 @@ class OrderAdmin(admin.ModelAdmin):
     ]
     readonly_fields = ["order_number", "created", "modified", "total_amount"]
     date_hierarchy = "created"
-    actions = ["approve_orders", "mark_in_progress", "mark_completed", "convert_to_project"]
+    actions = ["convert_to_project"]
 
     fieldsets = (
         (
             "Order Information",
             {
-                "fields": ("order_number", "status", "created", "modified"),
+                "fields": ("order_number", "created", "modified"),
             },
         ),
         (
@@ -76,52 +74,6 @@ class OrderAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         # Prevent deletion of orders
         return False
-
-    def status_badge(self, obj):
-        """Display status with color-coded badge."""
-        colors = {
-            "pending": "warning",
-            "confirmed": "info",
-            "in_progress": "primary",
-            "completed": "success",
-            "cancelled": "danger",
-        }
-        color = colors.get(obj.status, "secondary")
-        return format_html(
-            '<span class="badge bg-{}">{}</span>',
-            color,
-            obj.get_status_display()
-        )
-    status_badge.short_description = "Status"
-
-    @admin.action(description="Approve selected orders")
-    def approve_orders(self, request, queryset):
-        """Approve pending orders."""
-        updated = queryset.filter(status="pending").update(status="confirmed")
-        self.message_user(
-            request,
-            f"{updated} order(s) approved and status changed to 'Confirmed'.",
-        )
-
-    @admin.action(description="Mark as In Progress")
-    def mark_in_progress(self, request, queryset):
-        """Mark orders as in progress."""
-        updated = queryset.exclude(status__in=["completed", "cancelled"]).update(
-            status="in_progress"
-        )
-        self.message_user(
-            request,
-            f"{updated} order(s) marked as 'In Progress'.",
-        )
-
-    @admin.action(description="Mark as Completed")
-    def mark_completed(self, request, queryset):
-        """Mark orders as completed."""
-        updated = queryset.exclude(status="cancelled").update(status="completed")
-        self.message_user(
-            request,
-            f"{updated} order(s) marked as 'Completed'.",
-        )
 
     @admin.action(description="Convert to Project")
     def convert_to_project(self, request, queryset):
@@ -163,11 +115,6 @@ class OrderAdmin(admin.ModelAdmin):
                     status="planning",
                     progress_percentage=0,
                 )
-
-                # Update order status if it's still pending
-                if order.status == "pending":
-                    order.status = "confirmed"
-                    order.save()
 
                 created += 1
             except Exception as e:

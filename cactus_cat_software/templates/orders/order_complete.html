@@ -1,81 +1,180 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Order Complete{% endblock %}
+{% block title %}Quote Received | Cactus Cat Software{% endblock %}
+
+{% block css %}
+{{ block.super }}
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,400&display=swap" rel="stylesheet">
+<style>
+  html { background: #0a0c1a; }
+  body { font-family: 'Space Grotesk', sans-serif; background: transparent !important; }
+  #pageStars { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; }
+  footer { background: transparent !important; position: relative; z-index: 1; }
+
+  .complete-wrap {
+    min-height: calc(100vh - 80px);
+    display: flex; align-items: flex-start; justify-content: center;
+    padding: 72px 16px 100px;
+    position: relative; z-index: 1;
+  }
+
+  .complete-card {
+    width: 100%; max-width: 560px;
+    border: 1px solid rgba(131,163,132,0.3);
+    background: rgba(10,12,26,0.75);
+    backdrop-filter: blur(10px);
+    padding: 40px;
+    position: relative;
+  }
+
+  .service-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 3px 12px;
+    border: 1px solid rgba(131,163,132,0.3);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: #83A384;
+  }
+
+  .detail-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(131,163,132,0.08);
+    font-size: 14px;
+  }
+  .detail-row:last-child { border-bottom: none; }
+  .detail-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: rgba(245,242,234,0.4);
+  }
+  .detail-val { color: #f5f2ea; font-family: 'Space Grotesk', sans-serif; }
+
+  .next-step {
+    display: flex; gap: 16px; padding: 14px 0;
+    border-bottom: 1px solid rgba(131,163,132,0.07);
+  }
+  .next-step:last-child { border-bottom: none; }
+  .next-num {
+    font-family: 'Fraunces', serif;
+    font-size: 1rem; font-weight: 600;
+    color: rgba(131,163,132,0.35); min-width: 24px; line-height: 1.5; flex-shrink: 0;
+  }
+  .next-title { font-size: 14px; font-weight: 600; color: rgba(245,242,234,0.85); margin-bottom: 2px; }
+  .next-body  { font-size: 12px; color: rgba(245,242,234,0.45); line-height: 1.6; }
+  .btn { border-radius: 0 !important; }
+</style>
+{% endblock css %}
 
 {% block content %}
-<div class="container py-5">
-  <div class="row">
-    <div class="col-lg-6 mx-auto text-center">
-      <div class="mb-4">
-        <i class="bi bi-check-circle-fill" style="font-size: 5rem; color: var(--accent-green);"></i>
-      </div>
+<canvas id="pageStars"></canvas>
 
-      <h1 class="display-5 fw-bold mb-3">Thank You!</h1>
-      <p class="lead mb-4">Your order has been received successfully.</p>
+<div class="complete-wrap">
+  <div class="complete-card">
+    <span class="ds-corner ds-corner-tl"></span>
+    <span class="ds-corner ds-corner-tr"></span>
+    <span class="ds-corner ds-corner-bl"></span>
+    <span class="ds-corner ds-corner-br"></span>
 
-      <div class="card mb-4 text-start">
-        <div class="card-body">
-          <h2 class="h5 mb-3">Order Details</h2>
-          <dl class="row">
-            <dt class="col-sm-4">Order Number:</dt>
-            <dd class="col-sm-8"><strong>{{ order.order_number }}</strong></dd>
+    <!-- Header -->
+    <div style="margin-bottom:28px;">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:#83A384;">· Quote received</span>
+      <h1 style="font-family:'Fraunces',serif;font-size:2rem;font-weight:700;color:#f5f2ea;letter-spacing:-0.02em;margin:8px 0 4px;">We've got your brief.</h1>
+      <p style="font-family:'Space Grotesk',sans-serif;font-size:14px;color:rgba(245,242,234,0.45);margin:0;">Expect a reply within 24 hours.</p>
+    </div>
 
-            <dt class="col-sm-4">Status:</dt>
-            <dd class="col-sm-8">
-              <span class="badge bg-warning">{{ order.get_status_display }}</span>
-            </dd>
-          </dl>
+    <!-- Confirmation note -->
+    <div style="padding:14px 16px;border:1px solid rgba(131,163,132,0.2);background:rgba(131,163,132,0.05);margin-bottom:24px;">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#83A384;">
+        Confirmation sent to {{ order.customer_email }}
+      </span>
+    </div>
+
+    <!-- What's next -->
+    <div style="margin-bottom:28px;">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(245,242,234,0.4);display:block;margin-bottom:12px;">· What happens next</span>
+      <div class="next-step">
+        <div class="next-num">01</div>
+        <div>
+          <div class="next-title">Brief review</div>
+          <div class="next-body">We review your submission and prepare questions about scope and timeline.</div>
         </div>
       </div>
-
-      <div class="card mb-4 text-start">
-        <div class="card-body">
-          <h2 class="h5 mb-3">Service Requested</h2>
-          {% if order.items.exists %}
-            {% for item in order.items.all %}
-              <div class="mb-4 {% if not forloop.last %}pb-3 border-bottom{% endif %}">
-                <h3 class="h4 mb-2">{{ item.service_package.name }}</h3>
-                <p class="mb-2">{{ item.service_package.short_description }}</p>
-                <p class="text-muted small mb-0">Estimated: ${{ item.get_total_price }}</p>
-              </div>
-            {% endfor %}
-            <div class="mt-3 pt-3 border-top">
-              <div class="d-flex justify-content-between">
-                <span class="text-muted">Estimated Total:</span>
-                <span class="text-muted">${{ order.total_amount }}</span>
-              </div>
-            </div>
-          {% else %}
-            <h3 class="h4 mb-2">{{ order.service_package.name }}</h3>
-            <p class="mb-2">{{ order.service_package.short_description }}</p>
-            <p class="text-muted small mb-0">Estimated: ${{ order.total_amount }}</p>
-          {% endif %}
+      <div class="next-step">
+        <div class="next-num">02</div>
+        <div>
+          <div class="next-title">Discovery call</div>
+          <div class="next-body">We'll follow up within 24 hours to schedule a free call and align on the details.</div>
         </div>
       </div>
-
-      <div class="alert alert-success">
-        <i class="bi bi-envelope-check"></i>
-        <strong>Confirmation email sent!</strong><br>
-        We've sent a confirmation email to <strong>{{ order.customer_email }}</strong>.
-        Please check your inbox (and spam folder).
+      <div class="next-step">
+        <div class="next-num">03</div>
+        <div>
+          <div class="next-title">Fixed quote delivered</div>
+          <div class="next-body">Scope, price, and start date. No surprises, no obligation.</div>
+        </div>
       </div>
+    </div>
 
-      <h3 class="h5 mb-3">What's Next?</h3>
-      <p class="text-muted">
-        Our team will review your order and reach out to you within 1-2 business days
-        to discuss the project details and next steps.
-      </p>
-
+    <!-- Actions -->
+    <div style="display:flex;flex-direction:column;gap:8px;">
       {% if order.user %}
-        <a href="{% url 'projects:dashboard' %}" class="btn btn-primary me-2">
-          View My Projects
+        <a href="{% url 'projects:dashboard' %}" class="btn btn-primary" style="padding:11px;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:15px;text-align:center;">
+          Go to my dashboard →
         </a>
       {% endif %}
-      <a href="{% url 'services:catalog' %}" class="btn btn-outline-primary">
-        Browse More Services
+      <a href="{% url 'services:catalog' %}" style="text-align:center;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(245,242,234,0.35);text-decoration:none;padding:8px;">
+        Browse more services
       </a>
     </div>
   </div>
 </div>
 {% endblock %}
+
+{% block inline_javascript %}
+{{ block.super }}
+<script>
+(function () {
+  const canvas = document.getElementById('pageStars');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = () => window.innerWidth, H = () => window.innerHeight;
+  const STAR_COUNT = 220, BANDS = 3;
+  let stars = [], scrollY = 0, smooth = 0;
+  function resize() { canvas.width = W(); canvas.height = H(); }
+  function init() {
+    stars = [];
+    for (let i = 0; i < STAR_COUNT; i++) {
+      const d = Math.random();
+      stars.push({ x: Math.random()*W(), pageY: Math.random()*H()*BANDS, depth: d,
+        r: 0.15+d*d*2.6, oBase: 0.08+d*0.78, twA: 0.15+d*0.55,
+        twS: 0.0008+d*0.0035, ph: Math.random()*Math.PI*2,
+        warm: d>0.7&&Math.random()<0.18, cool: d>0.85&&Math.random()<0.12, glow: d>0.72 });
+    }
+  }
+  function draw() {
+    ctx.clearRect(0,0,W(),H());
+    stars.forEach(s => {
+      const pf = 0.05+s.depth*0.95, sy = s.pageY - smooth*pf;
+      if (sy < -10 || sy > H()+10) return;
+      s.ph += s.twS;
+      const op = Math.max(0,Math.min(1,s.oBase*(1-s.twA*(0.5+0.5*Math.sin(s.ph)))));
+      const col = s.warm?`rgba(255,215,150,${op})`:s.cool?`rgba(180,210,255,${op})`:`rgba(235,242,255,${op})`;
+      if (s.glow&&s.r>1.5) {
+        const g=ctx.createRadialGradient(s.x,sy,0,s.x,sy,s.r*5);
+        g.addColorStop(0,s.warm?`rgba(255,200,100,${op*0.18})`:`rgba(200,220,255,${op*0.14})`);
+        g.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.beginPath();ctx.arc(s.x,sy,s.r*5,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();
+      }
+      ctx.beginPath();ctx.arc(s.x,sy,s.r,0,Math.PI*2);ctx.fillStyle=col;ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener('scroll',()=>{scrollY=window.scrollY;},{passive:true});
+  (function tick(){smooth+=(scrollY-smooth)*0.07;requestAnimationFrame(tick);})();
+  resize(); init(); draw();
+  window.addEventListener('resize',()=>{resize();init();});
+})();
+</script>
+{% endblock inline_javascript %}

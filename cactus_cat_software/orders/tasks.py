@@ -1,50 +1,50 @@
 from celery import shared_task
 from django.conf import settings
-from django.core.mail import EmailMultiAlternatives
-from django.template.loader import render_to_string
+from django.core.mail import send_mail
 
 from .models import Order
-from .utils import generate_order_receipt_pdf
 
 
 @shared_task()
 def send_order_confirmation_email(order_id):
-    """Send order confirmation email to customer with PDF receipt."""
+    """Send order confirmation email to customer."""
     try:
         order = Order.objects.select_related("service_package").prefetch_related("items__service_package").get(id=order_id)
     except Order.DoesNotExist:
         return
 
-    # Generate PDF receipt
-    pdf_buffer = generate_order_receipt_pdf(order)
+    if order.items.exists():
+        items_text = "\n".join(
+            f"- {item.quantity}x {item.service_package.name}"
+            for item in order.items.all()
+        )
+    else:
+        name = order.service_package.name if order.service_package else "N/A"
+        items_text = f"- 1x {name}"
 
-    # Render email templates
-    subject = f"Order Confirmation - {order.order_number}"
-    from_email = settings.DEFAULT_FROM_EMAIL
-    to_email = order.customer_email
+    message = f"""Hi {order.customer_name},
 
-    context = {
-        "order": order,
-        "site_name": "Cactus Cat Software",
-    }
+Thank you for your quote request with Cactus Cat Software.
 
-    text_content = render_to_string("orders/emails/order_receipt.txt", context)
-    html_content = render_to_string("orders/emails/order_receipt.html", context)
+Order Number: {order.order_number}
+Date: {order.created.strftime("%B %d, %Y")}
 
-    # Create email with PDF attachment
-    msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
-    msg.attach_alternative(html_content, "text/html")
+Services Requested:
+{items_text}
+"""
 
-    # Attach PDF receipt
-    msg.attach(
-        f"receipt_{order.order_number}.pdf",
-        pdf_buffer.read(),
-        "application/pdf"
+    if order.custom_requirements:
+        message += f"\nNotes:\n{order.custom_requirements}\n"
+
+    message += "\nWe'll review your request and be in touch within 24 hours. For questions, contact us at hello@cactuscatsoftware.com\n\n-- Cactus Cat Software"
+
+    send_mail(
+        subject=f"Quote Request Received – {order.order_number}",
+        message=message,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=[order.customer_email],
     )
 
-    msg.send()
-
-    # Send notification to host
     send_order_notification_to_host.delay(order_id)
 
     return f"Sent confirmation email for order {order.order_number}"
@@ -58,24 +58,37 @@ def send_order_notification_to_host(order_id):
     except Order.DoesNotExist:
         return
 
-    # Host email
-    host_email = "hello@cactuscatsoftware.com"
+    if order.items.exists():
+        items_text = "\n".join(
+            f"- {item.quantity}x {item.service_package.name}"
+            for item in order.items.all()
+        )
+    else:
+        name = order.service_package.name if order.service_package else "N/A"
+        items_text = f"- 1x {name}"
 
-    # Render email templates
-    subject = f"New Order Received - {order.order_number}"
-    from_email = settings.DEFAULT_FROM_EMAIL
+    message = f"""New quote request received.
 
-    context = {
-        "order": order,
-        "site_name": "Cactus Cat Software",
-    }
+Order Number: {order.order_number}
+Date: {order.created.strftime("%B %d, %Y")}
 
-    text_content = render_to_string("orders/emails/host_notification.txt", context)
-    html_content = render_to_string("orders/emails/host_notification.html", context)
+Customer: {order.customer_name}
+Email: {order.customer_email}
+Phone: {order.customer_phone or "N/A"}
+Company: {order.company_name or "N/A"}
 
-    # Create email
-    msg = EmailMultiAlternatives(subject, text_content, from_email, [host_email])
-    msg.attach_alternative(html_content, "text/html")
-    msg.send()
+Services Requested:
+{items_text}
+"""
+
+    if order.custom_requirements:
+        message += f"\nNotes:\n{order.custom_requirements}\n"
+
+    send_mail(
+        subject=f"New Quote Request – {order.order_number}",
+        message=message,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=["cactuscatllc@gmail.com"],
+    )
 
     return f"Sent host notification for order {order.order_number}"

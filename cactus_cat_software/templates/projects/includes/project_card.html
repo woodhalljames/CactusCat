@@ -1,39 +1,41 @@
 {% load static %}
 
-<div class="col-md-6 col-lg-4">
+<div class="col-md-6">
   <div class="card h-100">
     <div class="card-body">
-      <div class="d-flex justify-content-between align-items-start mb-3">
-        <h3 class="h5 card-title mb-0">{{ project.project_name }}</h3>
-        <span class="badge project-status-badge status-{{ project.status }}">
-          {{ project.get_status_display }}
-        </span>
-      </div>
-
-      <p class="text-muted small mb-3">
-        Started {{ project.created|date:"F d, Y" }}
-      </p>
-
-      <div class="mb-3">
-        <div class="d-flex justify-content-between align-items-center mb-1">
-          <small class="text-muted">Progress</small>
-          <small class="text-muted">{{ project.progress_percentage }}%</small>
-        </div>
-        <div class="progress">
-          <div class="progress-bar" role="progressbar"
-               style="width: {{ project.progress_percentage }}%"
-               aria-valuenow="{{ project.progress_percentage }}"
-               aria-valuemin="0" aria-valuemax="100"></div>
-        </div>
-      </div>
+      <h3 class="h5 card-title mb-2">{{ project.project_name }}</h3>
 
       {% if project.status_notes %}
-        <p class="text-muted small mb-3">{{ project.status_notes|truncatewords:15 }}</p>
+        <p class="small text-muted mb-3">{{ project.status_notes|truncatewords:20 }}</p>
+      {% endif %}
+
+      <!-- Phase Bars -->
+      {% if project.phases.all %}
+        <div class="mb-3">
+          {% for phase in project.phases.all %}
+            <div class="mb-2">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <small class="text-muted" style="font-size: 0.75rem;">{{ phase.name }}</small>
+                <small class="text-muted" style="font-size: 0.75rem;">{{ phase.progress_percentage }}%</small>
+              </div>
+              <div class="progress" style="height: 5px;">
+                <div class="progress-bar
+                  {% if phase.progress_percentage == 100 %}bg-success
+                  {% elif phase.progress_percentage > 0 %}bg-primary
+                  {% else %}bg-secondary{% endif %}"
+                     role="progressbar"
+                     style="width: {{ phase.progress_percentage }}%"
+                     aria-valuenow="{{ phase.progress_percentage }}"
+                     aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
       {% endif %}
 
       <div class="mt-auto">
-        <a href="{% url 'projects:detail' project.pk %}" class="btn btn-outline-primary btn-sm w-100">
-          View Details
+        <a href="{{ project.get_absolute_url }}" class="btn btn-outline-primary btn-sm w-100">
+          View Project
         </a>
       </div>
     </div>

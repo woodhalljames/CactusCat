@@ -17,20 +17,14 @@ class Cart:
         self.cart = cart
 
     def add(self, service_package, quantity=1, override_quantity=False):
-        """
-        Add a service to the cart or update its quantity.
-        """
+        """Add a service to the cart. Max quantity is 1 per service."""
         service_id = str(service_package.id)
         if service_id not in self.cart:
             self.cart[service_id] = {
-                'quantity': 0,
+                'quantity': 1,
                 'price': str(service_package.price)
             }
-        if override_quantity:
-            self.cart[service_id]['quantity'] = quantity
-        else:
-            self.cart[service_id]['quantity'] += quantity
-        self.save()
+            self.save()
 
     def save(self):
         """Mark the session as modified to make sure it gets saved."""

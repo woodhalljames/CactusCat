@@ -17,6 +17,12 @@ class AccountAdapter(DefaultAccountAdapter):
     def is_open_for_signup(self, request: HttpRequest) -> bool:
         return getattr(settings, "ACCOUNT_ALLOW_REGISTRATION", True)
 
+    def get_login_redirect_url(self, request: HttpRequest) -> str:
+        if request.session.pop("pending_business_apply", False):
+            from django.urls import reverse
+            return reverse("courses:business_apply")
+        return super().get_login_redirect_url(request)
+
 
 class SocialAccountAdapter(DefaultSocialAccountAdapter):
     def is_open_for_signup(

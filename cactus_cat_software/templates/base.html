@@ -4,9 +4,9 @@
 <head>
   <meta charset="utf-8" />
   <meta http-equiv="x-ua-compatible" content="ie=edge" />
-  <title>{% block title %}Cactus Cat Software | Business Software Solutions{% endblock title %}</title>
+  <title>{% block title %}Cactus Cat Software | Web Apps. Marketing. Automate. Software built for your life.{% endblock title %}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="{% block meta_description %}Cactus Cat Software delivers custom web development, business automation, and cybersecurity solutions. Northeast-based, serving clients globally.{% endblock %}" />
+  <meta name="description" content="{% block meta_description %}Streamline operations. Automate workflows. Build better software. East Coast studio delivering custom software, automation & AI systems, and technical marketing. Fixed price, owned by you.{% endblock %}" />
   <meta name="author" content="Cactus Cat Software" />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="{% block canonical_url %}https://www.cactuscatsoftware.com{{ request.path }}{% endblock %}" />
@@ -15,17 +15,17 @@
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="{% block og_type %}website{% endblock %}" />
   <meta property="og:url" content="https://www.cactuscatsoftware.com{{ request.path }}" />
-  <meta property="og:title" content="{% block og_title %}Cactus Cat Software | Business Software Solutions{% endblock %}" />
-  <meta property="og:description" content="{% block og_description %}Custom web development, business automation, and cybersecurity solutions. Northeast-based, serving clients globally.{% endblock %}" />
-  <meta property="og:image" content="{% block og_image %}{% static 'images/Cactus_Cat_Logo.png' %}{% endblock %}" />
+  <meta property="og:title" content="{% block og_title %}Cactus Cat Software | Streamline Operations. Automate Workflows. Build Better Software.{% endblock %}" />
+  <meta property="og:description" content="{% block og_description %}Streamline operations. Automate workflows. Build better software. Fixed price, fixed timeline — owned by you from day one.{% endblock %}" />
+  <meta property="og:image" content="{% block og_image %}https://www.cactuscatsoftware.com{% static 'images/Cactus_Cat_Logo.png' %}{% endblock %}" />
   <meta property="og:site_name" content="Cactus Cat Software" />
   <meta property="og:locale" content="en_US" />
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="{% block twitter_title %}Cactus Cat Software | Business Software Solutions{% endblock %}" />
-  <meta name="twitter:description" content="{% block twitter_description %}Custom web development, business automation, and cybersecurity solutions. Northeast-based, serving clients globally.{% endblock %}" />
-  <meta name="twitter:image" content="{% block twitter_image %}{% static 'images/Cactus_Cat_Logo.png' %}{% endblock %}" />
+  <meta name="twitter:title" content="{% block twitter_title %}Cactus Cat Software | Streamline Operations. Automate Workflows. Build Better Software.{% endblock %}" />
+  <meta name="twitter:description" content="{% block twitter_description %}Streamline operations. Automate workflows. Build better software. Fixed price, fixed timeline — owned by you from day one.{% endblock %}" />
+  <meta name="twitter:image" content="{% block twitter_image %}https://www.cactuscatsoftware.com{% static 'images/Cactus_Cat_Logo.png' %}{% endblock %}" />
 
   <!-- JSON-LD Structured Data -->
   <script type="application/ld+json">
@@ -35,10 +35,10 @@
     "name": "Cactus Cat Software",
     "url": "https://www.cactuscatsoftware.com",
     "logo": "https://www.cactuscatsoftware.com{% static 'images/Cactus_Cat_Logo.png' %}",
-    "description": "Custom web development, business automation, digital marketing, and cybersecurity solutions. Northeast-based software company serving clients globally.",
+    "description": "Streamline operations. Automate workflows. Build better software. Custom software, automation & AI systems, technical marketing, and infrastructure & cybersecurity. East Coast studio, fixed price, clients own everything.",
     "email": "hello@cactuscatsoftware.com",
     "areaServed": "Worldwide",
-    "serviceType": ["Web Development", "Business Automation", "Digital Marketing", "Cybersecurity"],
+    "serviceType": ["Custom Software Development", "Automation & AI Systems", "Technical Marketing & Growth", "Infrastructure & Cybersecurity"],
     "sameAs": []
   }
   </script>
@@ -48,7 +48,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet"
@@ -79,60 +79,58 @@
 <body>
   {% block body %}
   <!-- Navigation -->
-  <nav class="navbar navbar-expand-lg navbar-dark">
-    <div class="container">
-      <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
-        <img src="{% static 'images/Cactus_Cat_Logo.png' %}" alt="Cactus Cat Software" class="navbar-logo">
-      </a>
-      <button class="navbar-toggler"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#navbarNav"
-              aria-controls="navbarNav"
-              aria-expanded="false"
-              aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
+  <nav class="ds-nav">
+
+    <!-- Left: brand -->
+    <a href="{% url 'home' %}" class="ds-nav-brand-link">
+      <img src="{% static 'images/Cactus_Cat_Logo.png' %}" alt="Cactus Cat Software" class="ds-nav-logo">
+      <span class="ds-nav-name">CACTUS_CAT</span>
+    </a>
+
+    <!-- Right: utility links (desktop) + hamburger (mobile) -->
+    <div class="ds-nav-right">
+      <a href="{% url 'contact' %}" class="ds-nav-link ds-nav-desktop-only">~/contact</a>
+      <a href="{% url 'services:catalog' %}" class="ds-nav-link ds-nav-desktop-only">~/services</a>
+      {% with count=cart|length %}
+      <a href="{% url 'orders:cart_detail' %}" id="dsQuoteLink" class="ds-nav-link ds-nav-desktop-only{% if count > 0 %} ds-nav-link--active{% endif %}">~/quote{% if count > 0 %}<span class="ds-nav-badge" id="dsCartBadge">{{ count }}</span>{% endif %}</a>
+      {% endwith %}
+      {% if request.user.is_authenticated %}
+        <div class="ds-nav-auth ds-nav-desktop-only" id="dsNavAuth">
+          <span class="ds-nav-link ds-nav-auth-toggle" id="dsNavAuthToggle">~/account ▾</span>
+          <div class="ds-nav-dropdown">
+            <a href="{% url 'projects:dashboard' %}">~/dashboard</a>
+            <a href="{% url 'account_logout' %}">~/sign-out</a>
+          </div>
+        </div>
+      {% else %}
+        {% if ACCOUNT_ALLOW_REGISTRATION %}
+          <a href="{% url 'account_signup' %}" class="ds-nav-link ds-nav-desktop-only">~/sign-up</a>
+        {% endif %}
+        <a href="{% url 'account_login' %}" class="ds-nav-link ds-nav-desktop-only">~/sign-in</a>
+      {% endif %}
+      <button class="ds-nav-toggler" id="dsNavToggler" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
       </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'services:catalog' %}">Services</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'orders:cart_detail' %}">
-              <i class="bi bi-cart3 me-2"></i>Cart
-              {% if cart %}
-                {% with total_items=cart|length %}
-                  {% if total_items > 0 %}
-                    <span class="badge bg-primary ms-2">{{ total_items }}</span>
-                  {% endif %}
-                {% endwith %}
-              {% endif %}
-            </a>
-          </li>
-          {% if request.user.is_authenticated %}
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Account
-              </a>
-              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                <li><a class="dropdown-item" href="{% url 'projects:dashboard' %}">My Dashboard</a></li>
-                <li><a class="dropdown-item" href="{% url 'account_logout' %}">Sign Out</a></li>
-              </ul>
-            </li>
-          {% else %}
-            {% if ACCOUNT_ALLOW_REGISTRATION %}
-              <li class="nav-item">
-                <a class="nav-link" href="{% url 'account_signup' %}">Sign Up</a>
-              </li>
-            {% endif %}
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'account_login' %}">Sign In</a>
-            </li>
-          {% endif %}
-        </ul>
-      </div>
     </div>
+
+    <!-- Mobile menu (full-width, revealed by hamburger) -->
+    <div class="ds-nav-links" id="dsNavLinks">
+      <a href="{% url 'contact' %}" class="ds-nav-link">~/contact</a>
+      <a href="{% url 'services:catalog' %}" class="ds-nav-link">~/services</a>
+      {% with count=cart|length %}
+      <a href="{% url 'orders:cart_detail' %}" class="ds-nav-link{% if count > 0 %} ds-nav-link--active{% endif %}">~/quote{% if count > 0 %}<span class="ds-nav-badge">{{ count }}</span>{% endif %}</a>
+      {% endwith %}
+      {% if request.user.is_authenticated %}
+        <a href="{% url 'projects:dashboard' %}" class="ds-nav-link">~/dashboard</a>
+        <a href="{% url 'account_logout' %}" class="ds-nav-link">~/sign-out</a>
+      {% else %}
+        {% if ACCOUNT_ALLOW_REGISTRATION %}
+          <a href="{% url 'account_signup' %}" class="ds-nav-link">~/sign-up</a>
+        {% endif %}
+        <a href="{% url 'account_login' %}" class="ds-nav-link">~/sign-in</a>
+      {% endif %}
+    </div>
+
   </nav>
 
   <!-- Messages -->
@@ -151,7 +149,7 @@
   <div class="toast-container" id="toastContainer"></div>
 
   <!-- Main Content -->
-  {% block content %}{% endblock %}
+  <main>{% block content %}{% endblock %}</main>
 
   <!-- Footer -->
   <footer>
@@ -163,7 +161,7 @@
               <img src="{% static 'images/Cactus_Cat_Logo.png' %}" alt="Cactus Cat Software" class="footer-logo">
             </a>
           </div>
-          <p class="text-muted mb-0">Go-to people for all things web.</p>
+          <p class="text-muted mb-0">Software built for life.</p>
         </div>
 
         <div class="col-lg-2 col-md-4 mb-4">
@@ -171,6 +169,7 @@
           <ul class="list-unstyled footer-links">
             <li class="mb-2"><a href="{% url 'home' %}">Home</a></li>
             <li class="mb-2"><a href="{% url 'about' %}">About</a></li>
+            <li class="mb-2"><a href="{% url 'faq' %}">FAQ</a></li>
             <li class="mb-2"><a href="{% url 'contact' %}">Contact</a></li>
           </ul>
         </div>
@@ -188,7 +187,6 @@
           <ul class="list-unstyled footer-links">
             {% if request.user.is_authenticated %}
               <li class="mb-2"><a href="{% url 'projects:dashboard' %}">My Dashboard</a></li>
-              <li class="mb-2"><a href="{% url 'orders:cart_detail' %}">Cart</a></li>
               <li class="mb-2"><a href="{% url 'account_logout' %}">Sign Out</a></li>
             {% else %}
               <li class="mb-2"><a href="{% url 'account_signup' %}">Sign Up</a></li>
@@ -199,7 +197,7 @@
 
         <div class="col-lg-3">
           <h6 class="mb-3" style="font-size: 0.95rem;">Newsletter</h6>
-          <p class="text-muted small mb-2">Stay updated on new products, speculation, and news</p>
+          <p class="text-muted small mb-2">Stay updated on products, speculation, and news</p>
           <form method="post" action="{% url 'newsletter_subscribe' %}" class="newsletter-form" id="newsletterForm">
             {% csrf_token %}
             <div class="input-group mb-2">
@@ -214,7 +212,7 @@
       </div>
       <hr class="mt-3 mb-3" style="border-color: var(--border-color);">
       <div class="text-center text-muted">
-        <small>&copy; {% now "Y" %} Cactus Cat Software. All rights reserved.</small>
+        <small>&copy; {% now "Y" %} Cactus Cat Software. Made in USA. All rights reserved.</small>
       </div>
     </div>
   </footer>
@@ -224,6 +222,28 @@
 
   {% block inline_javascript %}
     <script>
+      // ── Nav: toggler + auth dropdown ──
+      (function () {
+        var toggler = document.getElementById('dsNavToggler');
+        var links   = document.getElementById('dsNavLinks');
+        if (toggler && links) {
+          toggler.addEventListener('click', function () { links.classList.toggle('open'); });
+        }
+
+        var authToggle    = document.getElementById('dsNavAuthToggle');
+        var authContainer = document.getElementById('dsNavAuth');
+        if (authToggle && authContainer) {
+          authToggle.addEventListener('click', function (e) {
+            e.stopPropagation();
+            authContainer.classList.toggle('open');
+          });
+          document.addEventListener('click', function () {
+            authContainer.classList.remove('open');
+          });
+        }
+
+      })();
+
       window.addEventListener('DOMContentLoaded', () => {
         // Newsletter form AJAX submission
         const newsletterForm = document.getElementById('newsletterForm');
@@ -271,10 +291,10 @@
             .then(response => response.json())
             .then(data => {
               if (data.success) {
-                showToast(data.message, 'success', 'Cart');
+                showToast(data.message, 'success', 'Quote');
                 updateCartBadge(data.cart_count);
               } else {
-                showToast(data.message || 'Failed to add to cart', 'error', 'Cart');
+                showToast(data.message || 'Failed to add to quote', 'error', 'Quote');
               }
             })
             .catch(error => {
@@ -285,21 +305,23 @@
 
         // Update cart badge
         function updateCartBadge(count) {
-          const cartBadge = document.querySelector('.cart-badge');
+          const link  = document.getElementById('dsQuoteLink');
+          let   badge = document.getElementById('dsCartBadge');
+          if (!link) return;
           if (count > 0) {
-            if (cartBadge) {
-              cartBadge.textContent = count;
+            link.classList.add('ds-nav-link--active');
+            if (badge) {
+              badge.textContent = count;
             } else {
-              const cartLink = document.querySelector('.nav-link[href*="cart"]');
-              if (cartLink) {
-                const badge = document.createElement('span');
-                badge.className = 'cart-badge';
-                badge.textContent = count;
-                cartLink.appendChild(badge);
-              }
+              badge = document.createElement('span');
+              badge.id = 'dsCartBadge';
+              badge.className = 'ds-nav-badge';
+              badge.textContent = count;
+              link.appendChild(badge);
             }
-          } else if (cartBadge) {
-            cartBadge.remove();
+          } else {
+            link.classList.remove('ds-nav-link--active');
+            if (badge) badge.remove();
           }
         }
 

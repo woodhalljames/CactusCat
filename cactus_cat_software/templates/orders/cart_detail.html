@@ -1,80 +1,299 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Shopping Cart - Cactus Cat Software{% endblock %}
+{% block title %}Your Quote — Cactus Cat Software{% endblock %}
+
+{% block css %}
+{{ block.super }}
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,400&display=swap" rel="stylesheet">
+<style>
+  html { background: #0a0c1a; }
+  body { font-family: 'Space Grotesk', sans-serif; background: transparent !important; }
+  #pageStars { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; }
+  footer { background: transparent !important; position: relative; z-index: 1; }
+
+  .quote-wrap {
+    padding: 72px 0 120px;
+    position: relative; z-index: 1;
+  }
+
+  .quote-layout {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 32px;
+    align-items: start;
+  }
+
+  /* Main card */
+  .quote-card {
+    border: 1px solid rgba(131,163,132,0.25);
+    background: rgba(10,12,26,0.65);
+    backdrop-filter: blur(6px);
+    position: relative;
+  }
+
+  .quote-card-header {
+    padding: 14px 24px;
+    border-bottom: 1px solid rgba(131,163,132,0.12);
+    background: rgba(10,12,26,0.4);
+  }
+
+  .quote-card-body { padding: 4px 0; }
+
+  .quote-item {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    gap: 16px; padding: 16px 24px;
+    border-bottom: 1px solid rgba(131,163,132,0.07);
+    transition: background 0.2s;
+  }
+  .quote-item:last-child { border-bottom: none; }
+  .quote-item:hover { background: rgba(131,163,132,0.03); }
+
+  .quote-item-icon {
+    width: 32px; height: 32px;
+    border: 1px solid rgba(131,163,132,0.2);
+    background: rgba(131,163,132,0.06);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 2px;
+  }
+  .quote-item-icon i { color: #83A384; font-size: 0.75rem; }
+
+  .quote-item-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px; font-weight: 600; color: #f5f2ea;
+    margin-bottom: 2px; line-height: 1.3;
+  }
+  .quote-item-desc { font-size: 13px; color: rgba(245,242,234,0.45); line-height: 1.45; }
+
+  .quote-item-remove {
+    background: none;
+    border: 1px solid rgba(131,163,132,0.15);
+    color: rgba(245,242,234,0.4);
+    width: 26px; height: 26px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; flex-shrink: 0; font-size: 0.7rem;
+    margin-top: 4px;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .quote-item-remove:hover { border-color: rgba(220,53,69,0.5); color: #e05c6a; }
+
+  .quote-card-footer {
+    padding: 18px 24px;
+    border-top: 1px solid rgba(131,163,132,0.1);
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; flex-wrap: wrap;
+  }
+
+  /* Side card */
+  .side-card {
+    border: 1px solid rgba(131,163,132,0.22);
+    background: rgba(10,12,26,0.65);
+    backdrop-filter: blur(6px);
+    position: sticky; top: 24px;
+    position: relative;
+  }
+
+  .side-card-header {
+    padding: 14px 20px;
+    border-bottom: 1px solid rgba(131,163,132,0.1);
+    background: rgba(10,12,26,0.4);
+  }
+
+  .side-card-body { padding: 16px 20px 20px; }
+
+  .process-step {
+    display: flex; gap: 16px; padding: 14px 0;
+    border-bottom: 1px solid rgba(131,163,132,0.07);
+  }
+  .process-step:last-child { border-bottom: none; }
+  .process-num {
+    font-family: 'Fraunces', serif;
+    font-size: 1rem; font-weight: 600;
+    color: rgba(131,163,132,0.35); min-width: 28px; line-height: 1.5; flex-shrink: 0;
+  }
+  .process-title { font-size: 14px; font-weight: 600; color: rgba(245,242,234,0.85); margin-bottom: 3px; }
+  .process-body  { font-size: 12px; color: rgba(245,242,234,0.45); line-height: 1.6; }
+
+  /* Empty state */
+  .quote-empty {
+    border: 1px solid rgba(131,163,132,0.22);
+    background: rgba(10,12,26,0.65);
+    backdrop-filter: blur(6px);
+    padding: 72px 32px; text-align: center;
+    position: relative;
+  }
+
+  @media (max-width: 900px) {
+    .quote-layout { grid-template-columns: 1fr; }
+  }
+</style>
+{% endblock css %}
 
 {% block content %}
-<div class="container py-5">
-  <div class="row">
-    <div class="col-lg-10 mx-auto">
-      <h1 class="display-5 fw-bold mb-4">Shopping Cart</h1>
+<canvas id="pageStars"></canvas>
 
-      {% if cart %}
-        <div class="card">
-          <div class="card-body">
-            <div class="table-responsive">
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th>Service</th>
-                    <th class="text-muted" style="font-size: 0.875rem;">Price</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for item in cart %}
-                    <tr>
-                      <td>
-                        <h5 class="mb-2">{{ item.service.name }}</h5>
-                        <p class="text-muted mb-1">{{ item.service.short_description }}</p>
-                        <small class="text-muted">{{ item.service.service.name }}</small>
-                      </td>
-                      <td class="text-muted align-middle" style="font-size: 0.875rem;">${{ item.price }}</td>
-                      <td class="align-middle">
-                        <form method="post" action="{% url 'orders:cart_remove' item.service.id %}" class="d-inline">
-                          {% csrf_token %}
-                          <button type="submit" class="btn btn-sm btn-outline-danger" title="Remove from cart">
-                            <i class="bi bi-trash"></i>
-                          </button>
-                        </form>
-                      </td>
-                    </tr>
-                  {% endfor %}
-                </tbody>
-                <tfoot>
-                  <tr>
-                    <td class="text-end"><strong>Total:</strong></td>
-                    <td colspan="2" class="text-muted"><strong>${{ cart.get_total_price }}</strong></td>
-                  </tr>
-                </tfoot>
-              </table>
-            </div>
+<div class="quote-wrap">
+  <div class="container">
 
-            <div class="d-flex justify-content-between mt-4">
-              <a href="{% url 'services:catalog' %}" class="btn btn-outline-primary">
-                <i class="bi bi-arrow-left me-2"></i>Continue Shopping
-              </a>
-              <a href="{% url 'orders:cart_checkout' %}" class="btn btn-primary">
-                Proceed to Checkout
-              </a>
-            </div>
-          </div>
-        </div>
-
-     
-      {% else %}
-        <div class="card text-center py-5">
-          <div class="card-body">
-            <i class="bi bi-cart-x" style="font-size: 4rem; color: var(--muted-text);"></i>
-            <h3 class="h5 mt-4 mb-3">Your cart is empty</h3>
-            <p class="text-muted mb-4">Add some services to get started!</p>
-            <a href="{% url 'services:catalog' %}" class="btn btn-primary">
-              Browse Services
-            </a>
-          </div>
-        </div>
-      {% endif %}
+    <div style="margin-bottom:40px;">
+      <span class="ds-eyebrow">· Quote builder</span>
+      <h1 class="ds-display" style="font-size:clamp(2.5rem,5vw,4.5rem);margin:8px 0 0;">Your Quote.</h1>
     </div>
+
+    {% if cart %}
+      <div class="quote-layout">
+
+        <!-- Services list -->
+        <div>
+          <div class="quote-card">
+            <span class="ds-corner ds-corner-tl"></span>
+            <span class="ds-corner ds-corner-tr"></span>
+            <span class="ds-corner ds-corner-bl"></span>
+            <span class="ds-corner ds-corner-br"></span>
+            <div class="quote-card-header">
+              <span class="ds-eyebrow" style="margin:0;">· Services selected</span>
+            </div>
+            <div class="quote-card-body">
+              {% for item in cart %}
+                <div class="quote-item">
+                  <div style="display:flex;gap:14px;align-items:flex-start;">
+                    <div class="quote-item-icon"><i class="bi bi-code-square"></i></div>
+                    <div>
+                      <div class="quote-item-name">{{ item.service.name }}</div>
+                      {% if item.service.short_description %}
+                        <div class="quote-item-desc">{{ item.service.short_description }}</div>
+                      {% endif %}
+                    </div>
+                  </div>
+                  <form method="post" action="{% url 'orders:cart_remove' item.service.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="quote-item-remove" title="Remove">
+                      <i class="bi bi-x-lg"></i>
+                    </button>
+                  </form>
+                </div>
+              {% endfor %}
+            </div>
+            <div class="quote-card-footer">
+              <a href="{% url 'services:catalog' %}" class="ds-link" style="font-size:13px;">← Add more services</a>
+              <a href="{% url 'orders:cart_checkout' %}" class="ds-btn-solid" style="font-size:13px;padding:10px 20px;">
+                Request Quote →
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- What happens next -->
+        <div>
+          <div class="side-card">
+            <span class="ds-corner ds-corner-tl"></span>
+            <span class="ds-corner ds-corner-tr"></span>
+            <span class="ds-corner ds-corner-bl"></span>
+            <span class="ds-corner ds-corner-br"></span>
+            <div class="side-card-header">
+              <span class="ds-eyebrow" style="margin:0;">· What happens next</span>
+            </div>
+            <div class="side-card-body">
+              <div class="process-step">
+                <div class="process-num">01</div>
+                <div>
+                  <div class="process-title">Submit your details</div>
+                  <div class="process-body">Fill in contact info and project requirements on the next page.</div>
+                </div>
+              </div>
+              <div class="process-step">
+                <div class="process-num">02</div>
+                <div>
+                  <div class="process-title">Discovery call</div>
+                  <div class="process-body">We'll follow up within 1–2 business days to align on scope.</div>
+                </div>
+              </div>
+              <div class="process-step">
+                <div class="process-num">03</div>
+                <div>
+                  <div class="process-title">Tailored quote delivered</div>
+                  <div class="process-body">Fixed scope, fixed price. No surprises, no obligation.</div>
+                </div>
+              </div>
+              <div class="process-step">
+                <div class="process-num">04</div>
+                <div>
+                  <div class="process-title">Project kicks off</div>
+                  <div class="process-body">Dashboard goes live and we get to work.</div>
+                </div>
+              </div>
+              <div style="padding-top:14px;margin-top:4px;border-top:1px solid rgba(131,163,132,0.08);">
+                <span class="ds-eyebrow" style="margin:0;font-size:9px;">
+                  <i class="bi bi-shield-check me-1" style="color:#83A384;"></i>
+                  No payment or commitment required.
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    {% else %}
+      <div class="quote-empty">
+        <span class="ds-corner ds-corner-tl"></span>
+        <span class="ds-corner ds-corner-tr"></span>
+        <span class="ds-corner ds-corner-bl"></span>
+        <span class="ds-corner ds-corner-br"></span>
+        <span class="ds-eyebrow" style="display:block;margin-bottom:16px;">· Quote is empty</span>
+        <h2 class="ds-display" style="font-size:clamp(1.5rem,3vw,2.5rem);margin-bottom:12px;">Nothing here yet.</h2>
+        <p class="ds-body" style="font-size:16px;margin:0 0 28px;">Browse our services and add what you're interested in.</p>
+        <a href="{% url 'services:catalog' %}" class="ds-btn-solid">Browse Services →</a>
+      </div>
+    {% endif %}
+
   </div>
 </div>
 {% endblock %}
+
+{% block inline_javascript %}
+{{ block.super }}
+<script>
+(function () {
+  const canvas = document.getElementById('pageStars');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = () => window.innerWidth, H = () => window.innerHeight;
+  const STAR_COUNT = 240, BANDS = 4;
+  let stars = [], scrollY = 0, smooth = 0;
+  function resize() { canvas.width = W(); canvas.height = H(); }
+  function init() {
+    stars = [];
+    for (let i = 0; i < STAR_COUNT; i++) {
+      const d = Math.random();
+      stars.push({ x: Math.random()*W(), pageY: Math.random()*H()*BANDS, depth: d,
+        r: 0.15+d*d*2.6, oBase: 0.08+d*0.78, twA: 0.15+d*0.55,
+        twS: 0.0008+d*0.0035, ph: Math.random()*Math.PI*2,
+        warm: d>0.7&&Math.random()<0.18, cool: d>0.85&&Math.random()<0.12, glow: d>0.72 });
+    }
+  }
+  function draw() {
+    ctx.clearRect(0,0,W(),H());
+    stars.forEach(s => {
+      const pf = 0.05+s.depth*0.95, sy = s.pageY - smooth*pf;
+      if (sy < -10 || sy > H()+10) return;
+      s.ph += s.twS;
+      const op = Math.max(0,Math.min(1,s.oBase*(1-s.twA*(0.5+0.5*Math.sin(s.ph)))));
+      const col = s.warm?`rgba(255,215,150,${op})`:s.cool?`rgba(180,210,255,${op})`:`rgba(235,242,255,${op})`;
+      if (s.glow&&s.r>1.5) {
+        const g=ctx.createRadialGradient(s.x,sy,0,s.x,sy,s.r*5);
+        g.addColorStop(0,s.warm?`rgba(255,200,100,${op*0.18})`:`rgba(200,220,255,${op*0.14})`);
+        g.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.beginPath();ctx.arc(s.x,sy,s.r*5,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();
+      }
+      ctx.beginPath();ctx.arc(s.x,sy,s.r,0,Math.PI*2);ctx.fillStyle=col;ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener('scroll',()=>{scrollY=window.scrollY;},{passive:true});
+  (function tick(){smooth+=(scrollY-smooth)*0.07;requestAnimationFrame(tick);})();
+  resize(); init(); draw();
+  window.addEventListener('resize',()=>{resize();init();});
+})();
+</script>
+{% endblock inline_javascript %}

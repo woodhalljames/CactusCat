@@ -8,70 +8,11 @@
   <h1 class="display-5 fw-bold mb-4">Account Dashboard</h1>
 
   <div class="row">
-    <!-- Left Column: Projects & Orders -->
+    <!-- Left Column: Projects & Invoices -->
     <div class="col-lg-8">
-      <!-- Orders Section -->
-      <section class="mb-5">
-        <h2 class="h4 mb-3">Orders</h2>
-        {% if orders %}
-          <div class="row g-3">
-            {% for order in orders %}
-              <div class="col-12">
-                <div class="card">
-                  <div class="card-body">
-                    <div class="row align-items-center">
-                      <div class="col-md-8">
-                        <div class="d-flex align-items-center mb-2">
-                          <h3 class="h5 mb-0 me-3">Order #{{ order.order_number }}</h3>
-                          <span class="badge bg-{% if order.status == 'pending' %}warning{% elif order.status == 'confirmed' %}info{% elif order.status == 'in_progress' %}primary{% elif order.status == 'completed' %}success{% else %}danger{% endif %}">
-                            {{ order.get_status_display }}
-                          </span>
-                        </div>
-                        <p class="text-muted small mb-2">Placed on {{ order.created|date:"F d, Y" }}</p>
-                        {% if order.items.exists %}
-                          <div class="mt-2">
-                            {% for item in order.items.all %}
-                              <div class="mb-1">
-                                <strong>{{ item.service_package.name }}</strong>
-                                <p class="text-muted small mb-0">{{ item.service_package.short_description }}</p>
-                              </div>
-                            {% endfor %}
-                          </div>
-                        {% else %}
-                          <div class="mt-2">
-                            <strong>{{ order.service_package.name }}</strong>
-                            <p class="text-muted small mb-0">{{ order.service_package.short_description }}</p>
-                          </div>
-                        {% endif %}
-                      </div>
-                      <div class="col-md-4 text-md-end">
-                        <p class="text-muted small mb-2">Estimated: ${{ order.total_amount }}</p>
-                        <a href="{% url 'orders:detail' order.order_number %}" class="btn btn-sm btn-outline-primary">
-                          View Details
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            {% endfor %}
-          </div>
-        {% else %}
-          <div class="card">
-            <div class="card-body text-center py-4">
-              <i class="bi bi-receipt" style="font-size: 2.5rem; color: var(--muted-text);"></i>
-              <h3 class="h6 mt-3">No orders yet</h3>
-              <p class="text-muted mb-3">Browse our services and place your first order!</p>
-              <a href="{% url 'services:catalog' %}" class="btn btn-primary btn-sm">
-                Browse Services
-              </a>
-            </div>
-          </div>
-        {% endif %}
-      </section>
 
       <!-- Projects Section -->
-      <section>
+      <section class="mb-5">
         <h2 class="h4 mb-3">Projects</h2>
         {% if projects %}
           <div class="row g-4">
@@ -91,26 +32,154 @@
           </div>
         {% endif %}
       </section>
+
+      <!-- Quote Requests Section -->
+      <section class="mb-5">
+        <h2 class="h4 mb-3">Quote Requests</h2>
+        {% if orders %}
+          <div class="d-flex flex-column gap-3">
+            {% for order in orders %}
+              <div class="card">
+                <div class="card-body">
+
+                  <!-- Header row -->
+                  <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+                    <div>
+                      <div class="small fw-semibold" style="color:var(--light-text);">
+                        {% if order.items.exists %}
+                          {% for item in order.items.all %}{{ item.service_package.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                        {% elif order.service_package %}
+                          {{ order.service_package.name }}
+                        {% else %}
+                          Quote Request
+                        {% endif %}
+                      </div>
+                      <div class="text-muted small mt-1">Submitted {{ order.created|date:"M d, Y" }}</div>
+                    </div>
+                    <span class="badge bg-secondary" style="font-size:10px;letter-spacing:0.06em;">{{ order.order_number }}</span>
+                  </div>
+
+                  <!-- Contact details -->
+                  <div class="d-flex flex-wrap gap-3 mb-3" style="font-size:13px;">
+                    <span class="text-muted"><i class="bi bi-person me-1"></i>{{ order.customer_name }}</span>
+                    <span class="text-muted"><i class="bi bi-envelope me-1"></i>{{ order.customer_email }}</span>
+                    {% if order.customer_phone %}<span class="text-muted"><i class="bi bi-telephone me-1"></i>{{ order.customer_phone }}</span>{% endif %}
+                    {% if order.company_name %}<span class="text-muted"><i class="bi bi-building me-1"></i>{{ order.company_name }}</span>{% endif %}
+                  </div>
+
+                  <!-- Notes / requirements -->
+                  {% if order.custom_requirements %}
+                    <div style="background:var(--surface-alt,rgba(0,0,0,0.15));border-left:2px solid var(--accent-green,#83A384);padding:10px 14px;border-radius:0 4px 4px 0;">
+                      <div class="text-muted" style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px;">Notes</div>
+                      <div style="font-size:14px;white-space:pre-line;color:var(--light-text);">{{ order.custom_requirements }}</div>
+                    </div>
+                  {% endif %}
+
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="card">
+            <div class="card-body text-center py-4">
+              <i class="bi bi-send" style="font-size:2.5rem;color:var(--muted-text);"></i>
+              <h3 class="h6 mt-3">No quote requests yet</h3>
+              <p class="text-muted mb-3">Browse our services and submit a brief to get started.</p>
+              <a href="{% url 'services:catalog' %}" class="btn btn-sm btn-primary">Browse services</a>
+            </div>
+          </div>
+        {% endif %}
+      </section>
+
+      <!-- Invoices & Payments Section -->
+      <section class="mb-5">
+        <h2 class="h4 mb-3">Invoices & Payments</h2>
+        {% if invoices %}
+          <div class="row g-3">
+            {% for invoice in invoices %}
+              <div class="col-12">
+                <div class="card">
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                      <div>
+                        <h3 class="h6 mb-1">{{ invoice.invoice_number }}</h3>
+                        <small class="text-muted">{{ invoice.project.project_name }}</small>
+                        {% if invoice.due_date %}
+                          <small class="text-muted d-block">Due: {{ invoice.due_date|date:"M d, Y" }}</small>
+                        {% endif %}
+                      </div>
+                      <div class="text-end">
+                        <div class="fw-bold fs-5 text-primary">${{ invoice.amount }}</div>
+                        <span class="badge
+                          {% if invoice.status == 'paid' %}bg-success
+                          {% elif invoice.status == 'overdue' %}bg-danger
+                          {% elif invoice.status == 'sent' %}bg-warning text-dark
+                          {% else %}bg-secondary{% endif %}">
+                          {{ invoice.get_status_display }}
+                        </span>
+                      </div>
+                    </div>
+
+                    {% if invoice.status == 'paid' and invoice.paid_date %}
+                      <div class="mt-3 p-2 rounded" style="background: var(--surface-alt, #f8f9fa);">
+                        <small class="text-success">
+                          <i class="bi bi-check-circle-fill me-1"></i>
+                          Payment confirmed {{ invoice.paid_date|date:"M d, Y" }}
+                          {% if invoice.payment_method %} via {{ invoice.payment_method }}{% endif %}
+                        </small>
+                      </div>
+                    {% else %}
+                      <div class="d-flex gap-2 mt-3 flex-wrap">
+                        {% if invoice.payment_url %}
+                          <a href="{{ invoice.payment_url }}" target="_blank" rel="noopener noreferrer"
+                             class="btn btn-sm btn-primary">
+                            <i class="bi bi-credit-card me-1"></i>Pay Now
+                          </a>
+                        {% endif %}
+                        {% if invoice.invoice_file %}
+                          <a href="{{ invoice.invoice_file.url }}" target="_blank"
+                             class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-file-earmark-text me-1"></i>View Invoice
+                          </a>
+                        {% endif %}
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="card">
+            <div class="card-body text-center py-4">
+              <i class="bi bi-receipt" style="font-size: 2.5rem; color: var(--muted-text);"></i>
+              <h3 class="h6 mt-3">No invoices yet</h3>
+              <p class="text-muted mb-0">Invoices and payment confirmations will appear here.</p>
+            </div>
+          </div>
+        {% endif %}
+      </section>
+
     </div>
 
-    <!-- Right Column: User Info & Business Info -->
+    <!-- Right Column: Account & Business Info -->
     <div class="col-lg-4">
+
       <!-- User Information Card -->
       <section class="mb-4">
         <h2 class="h4 mb-3">Account Information</h2>
         <div class="card">
-          <div class="card-body">
-          
-            <div class="mb-3">
-              <label class="text-muted small mb-1">Email</label>
-              <p class="mb-2">{{ user.email }}</p>
+          <div class="card-body p-0">
+            <div class="px-3 py-3 border-bottom">
+              <label class="text-muted small mb-1 d-block">Email</label>
+              <p class="mb-2 small">{{ user.email }}</p>
               <a href="{% url 'account_email' %}" class="btn btn-sm btn-outline-primary">
                 <i class="bi bi-envelope me-1"></i>Change Email
               </a>
             </div>
-            <div class="mb-0">
-              <label class="text-muted small mb-1">Password</label>
-              <p class="mb-2">••••••••</p>
+            <div class="px-3 py-3">
+              <label class="text-muted small mb-1 d-block">Password</label>
+              <p class="mb-2 small">••••••••</p>
               <a href="{% url 'account_change_password' %}" class="btn btn-sm btn-outline-primary">
                 <i class="bi bi-lock me-1"></i>Change Password
               </a>
@@ -120,44 +189,208 @@
       </section>
 
       <!-- Business Information Card -->
-      <section>
+      <section class="mb-4">
         <h2 class="h4 mb-3">Business Information</h2>
         <div class="card">
           <div class="card-body">
-            <p class="text-muted small mb-3">
-              Add your business details to speed up future orders
-            </p>
-            <div class="mb-3">
-              <label class="text-muted small mb-1">Company Name</label>
-              <p class="mb-0">{{ user.company_name|default:"Not set" }}</p>
-            </div>
-            <div class="mb-3">
-              <label class="text-muted small mb-1">Phone Number</label>
-              <p class="mb-0">{{ user.phone_number|default:"Not set" }}</p>
-            </div>
-            <div class="mb-3">
-              <label class="text-muted small mb-1">Website</label>
-              <p class="mb-0">
-                {% if user.website %}
-                  <a href="{{ user.website }}" target="_blank" rel="noopener noreferrer">{{ user.website }}</a>
-                {% else %}
-                  Not set
-                {% endif %}
-              </p>
-            </div>
-            <div class="mb-3">
-              <label class="text-muted small mb-1">Additional Contacts</label>
-              <p class="mb-0" style="white-space: pre-line;">{{ user.additional_contacts|default:"Not set" }}</p>
-            </div>
-            <div class="mb-0">
-              <a href="{% url 'users:update' %}" class="btn btn-sm btn-primary w-100">
-                <i class="bi bi-pencil me-1"></i>Update Business Info
-              </a>
-            </div>
+            <form id="businessInfoForm">
+              {% csrf_token %}
+              <div class="mb-2">
+                <label class="text-muted small mb-1">Name</label>
+                {{ business_form.name }}
+              </div>
+              <div class="mb-2">
+                <label class="text-muted small mb-1">Company</label>
+                {{ business_form.company_name }}
+              </div>
+              <div class="mb-2">
+                <label class="text-muted small mb-1">Phone</label>
+                {{ business_form.phone_number }}
+              </div>
+              <div class="mb-3">
+                <label class="text-muted small mb-1">Website</label>
+                {{ business_form.website }}
+              </div>
+              <button type="submit" class="btn btn-sm btn-primary w-100" id="businessInfoBtn">
+                <i class="bi bi-check-lg me-1"></i>Save Changes
+              </button>
+              <div id="businessInfoMsg" class="mt-2 small text-center" style="display:none;"></div>
+            </form>
           </div>
         </div>
       </section>
+
+      <!-- Team Members Card -->
+      <section>
+        <h2 class="h4 mb-3">Team Members</h2>
+        <div class="card">
+          <div class="card-body">
+            <p class="text-muted small mb-3">
+              Invite coworkers to view your project dashboard and track progress alongside you.
+            </p>
+
+            <!-- Invite form -->
+            <form id="inviteForm" class="d-flex gap-2 mb-2">
+              {% csrf_token %}
+              <div class="flex-grow-1">{{ invite_form.email }}</div>
+              <button type="submit" class="btn btn-sm btn-primary" id="inviteBtn">
+                <i class="bi bi-send me-1"></i>Invite
+              </button>
+            </form>
+            <div id="inviteMsg" class="small mb-2" style="display:none;"></div>
+
+            <hr class="my-3">
+
+            <!-- Unified member list -->
+            <ul class="list-unstyled mb-0" id="memberList">
+              {% for invite in team_members %}
+                <li class="d-flex align-items-center justify-content-between py-2 border-bottom" id="member-{{ invite.id }}">
+                  <div>
+                    <div class="small fw-semibold">{{ invite.accepted_by.name|default:invite.email }}</div>
+                    <div class="text-muted" style="font-size:11px;">{{ invite.email }}</div>
+                    <span class="badge bg-success" style="font-size:9px;">Active</span>
+                  </div>
+                  <button class="btn btn-sm btn-outline-danger py-0 px-2"
+                          onclick="removeMember({{ invite.id }})" style="font-size:11px;">
+                    Remove
+                  </button>
+                </li>
+              {% endfor %}
+              {% for invite in pending_invites %}
+                <li class="d-flex align-items-center justify-content-between py-2 border-bottom" id="invite-{{ invite.id }}">
+                  <div>
+                    <div class="small">{{ invite.email }}</div>
+                    <span class="badge bg-warning text-dark" style="font-size:9px;">Pending</span>
+                  </div>
+                  <button class="btn btn-sm btn-outline-secondary py-0 px-2"
+                          onclick="revokeInvite({{ invite.id }})" style="font-size:11px;">
+                    Revoke
+                  </button>
+                </li>
+              {% endfor %}
+              {% if not team_members and not pending_invites %}
+                <li class="text-muted small py-1" id="emptyState">No team members yet.</li>
+              {% endif %}
+            </ul>
+          </div>
+        </div>
+      </section>
+
     </div>
   </div>
 </div>
+
+<script>
+// Business info save
+document.getElementById('businessInfoForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const btn = document.getElementById('businessInfoBtn');
+  const msg = document.getElementById('businessInfoMsg');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Saving…';
+
+  fetch('{% url "users:update_business_info" %}', {
+    method: 'POST',
+    headers: {'X-CSRFToken': this.querySelector('[name=csrfmiddlewaretoken]').value},
+    body: new FormData(this),
+  })
+  .then(r => r.json())
+  .then(data => {
+    msg.style.display = 'block';
+    if (data.success) {
+      msg.className = 'small mt-2 text-center text-success';
+      msg.textContent = 'Saved.';
+    } else {
+      msg.className = 'small mt-2 text-center text-danger';
+      msg.textContent = Object.values(data.errors || {}).flat().join(' ') || 'Error saving.';
+    }
+  })
+  .finally(() => {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="bi bi-check-lg me-1"></i>Save Changes';
+    setTimeout(() => { msg.style.display = 'none'; }, 3000);
+  });
+});
+
+// Send invite
+document.getElementById('inviteForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const btn = document.getElementById('inviteBtn');
+  const msg = document.getElementById('inviteMsg');
+  const emailInput = this.querySelector('input[type=email]');
+  btn.disabled = true;
+
+  fetch('{% url "users:send_invite" %}', {
+    method: 'POST',
+    headers: {'X-CSRFToken': this.querySelector('[name=csrfmiddlewaretoken]').value},
+    body: new FormData(this),
+  })
+  .then(r => r.json())
+  .then(data => {
+    msg.style.display = 'block';
+    if (data.success) {
+      msg.className = 'small mb-2 text-success';
+      msg.textContent = 'Invite sent to ' + data.invite.email;
+      emailInput.value = '';
+      document.getElementById('emptyState')?.remove();
+      const list = document.getElementById('memberList');
+      const li = document.createElement('li');
+      li.className = 'd-flex align-items-center justify-content-between py-2 border-bottom';
+      li.id = 'invite-' + data.invite.id;
+      li.innerHTML = `<div><div class="small">${data.invite.email}</div><span class="badge bg-warning text-dark" style="font-size:9px;">Pending</span></div>
+        <button class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="revokeInvite(${data.invite.id})" style="font-size:11px;">Revoke</button>`;
+      list.appendChild(li);
+    } else {
+      msg.className = 'small mb-2 text-danger';
+      msg.textContent = data.error || 'Could not send invite.';
+    }
+  })
+  .finally(() => { btn.disabled = false; });
+});
+
+function revokeInvite(id) {
+  if (!confirm('Revoke this invite?')) return;
+  fetch(`/users/~invite/${id}/revoke/`, {
+    method: 'POST',
+    headers: {'X-CSRFToken': getCsrf()},
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.success) {
+      document.getElementById('invite-' + id)?.remove();
+      checkEmpty();
+    }
+  });
+}
+
+function removeMember(id) {
+  if (!confirm('Remove this team member?')) return;
+  fetch(`/users/~invite/${id}/remove/`, {
+    method: 'POST',
+    headers: {'X-CSRFToken': getCsrf()},
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.success) {
+      document.getElementById('member-' + id)?.remove();
+      checkEmpty();
+    }
+  });
+}
+
+function checkEmpty() {
+  const list = document.getElementById('memberList');
+  if (list && list.querySelectorAll('li:not(#emptyState)').length === 0 && !document.getElementById('emptyState')) {
+    const li = document.createElement('li');
+    li.id = 'emptyState';
+    li.className = 'text-muted small py-1';
+    li.textContent = 'No team members yet.';
+    list.appendChild(li);
+  }
+}
+
+function getCsrf() {
+  return document.querySelector('[name=csrfmiddlewaretoken]').value;
+}
+</script>
 {% endblock %}

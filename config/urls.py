@@ -31,7 +31,12 @@ urlpatterns = [
         TemplateView.as_view(template_name="pages/about.html"),
         name="about",
     ),
-    path("contact/", user_views.contact_view, name="contact"),
+    path(
+        "contact/",
+        TemplateView.as_view(template_name="pages/contact.html"),
+        name="contact",
+    ),
+    path("faq/", TemplateView.as_view(template_name="pages/faq.html"), name="faq"),
     path(
         "newsletter/subscribe/",
         user_views.newsletter_subscribe_view,
@@ -45,7 +50,7 @@ urlpatterns = [
     # Apps
     path("services/", include("cactus_cat_software.services.urls", namespace="services")),
     path("blog/", include("cactus_cat_software.blog.urls", namespace="blog")),
-    path("orders/", include("cactus_cat_software.orders.urls", namespace="orders")),
+    path("quotes/", include("cactus_cat_software.orders.urls", namespace="orders")),
     path("projects/", include("cactus_cat_software.projects.urls", namespace="projects")),
     # Django Admin, use {% url 'admin:index' %}
     path(settings.ADMIN_URL, admin.site.urls),

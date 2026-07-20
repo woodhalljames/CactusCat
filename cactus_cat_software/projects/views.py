@@ -13,7 +13,7 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import DetailView, ListView
 
-from .models import Project, ProjectApproval, ProjectDeployment, ProjectNote
+from .models import Project, ProjectApproval, ProjectDeployment, ProjectInvoice, ProjectNote, ProjectQuestion
 
 logger = logging.getLogger(__name__)
 
@@ -26,22 +26,42 @@ class ProjectDashboardView(LoginRequiredMixin, ListView):
     context_object_name = "projects"
 
     def get_queryset(self):
+        from django.db.models import Q
         return (
-            Project.objects.filter(client=self.request.user)
-            .prefetch_related("updates", "invoices")
+            Project.objects.filter(
+                Q(client=self.request.user) | Q(collaborators=self.request.user)
+            )
+            .distinct()
+            .prefetch_related("phases", "invoices")
             .order_by("-created")
         )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Add user's orders to the context
         from cactus_cat_software.orders.models import Order
+        from cactus_cat_software.users.models import AccountInvite
+        from cactus_cat_software.users.forms import BusinessInfoForm, InviteForm
+
         context['orders'] = (
             Order.objects.filter(user=self.request.user)
             .select_related('service_package')
             .prefetch_related('items__service_package')
             .order_by('-created')
         )
+
+        context['invoices'] = (
+            ProjectInvoice.objects.filter(project__client=self.request.user)
+            .select_related('project')
+            .order_by('-created')
+        )
+        context['pending_invites'] = AccountInvite.objects.filter(
+            inviter=self.request.user, accepted=False
+        )
+        context['team_members'] = AccountInvite.objects.filter(
+            inviter=self.request.user, accepted=True
+        ).select_related('accepted_by')
+        context['business_form'] = BusinessInfoForm(instance=self.request.user)
+        context['invite_form'] = InviteForm(self.request.user)
         return context
 
 
@@ -52,8 +72,36 @@ class ProjectDetailView(LoginRequiredMixin, DetailView):
     template_name = "projects/project_detail.html"
     context_object_name = "project"
 
-    def get_queryset(self):
-        return Project.objects.filter(client=self.request.user).select_related("deployment")
+    def get_object(self, queryset=None):
+        from django.db.models import Q
+        return get_object_or_404(
+            Project.objects.filter(
+                Q(client=self.request.user) | Q(collaborators=self.request.user)
+            )
+            .distinct()
+            .select_related("deployment")
+            .prefetch_related(
+                "phases",
+                "phases__milestones",
+                "phases__updates",
+                "phases__approvals",
+                "phases__notes",
+                "phases__items",
+                "invoices",
+                "notes",
+                "milestones",
+                "updates",
+                "approvals",
+            ),
+            order__order_number=self.kwargs["order_number"],
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["pending_reviews_count"] = self.object.approvals.filter(status="pending").count()
+        context["phases"] = self.object.phases.all()
+        context["general_notes"] = self.object.notes.filter(phase__isnull=True)
+        return context
 
 
 class AddProjectNoteView(LoginRequiredMixin, View):
@@ -65,11 +113,13 @@ class AddProjectNoteView(LoginRequiredMixin, View):
             project = Project.objects.get(pk=pk)
 
             # Check if user has access to this project
-            if project.client != request.user and not request.user.is_staff:
-                return JsonResponse(
-                    {"success": False, "error": "Access denied"},
-                    status=403
-                )
+            has_access = (
+                project.client == request.user
+                or request.user.is_staff
+                or project.collaborators.filter(pk=request.user.pk).exists()
+            )
+            if not has_access:
+                return JsonResponse({"success": False, "error": "Access denied"}, status=403)
 
             # Handle both JSON and form data
             if request.content_type == "application/json":
@@ -115,6 +165,53 @@ class AddProjectNoteView(LoginRequiredMixin, View):
             )
 
 
+class EditNoteView(LoginRequiredMixin, View):
+    """Author edits their own note."""
+
+    def post(self, request, pk, note_id):
+        try:
+            project = Project.objects.get(pk=pk)
+            note = ProjectNote.objects.get(pk=note_id, project=project)
+        except (Project.DoesNotExist, ProjectNote.DoesNotExist):
+            return JsonResponse({"success": False, "error": "Not found"}, status=404)
+
+        if note.author != request.user:
+            return JsonResponse({"success": False, "error": "Not authorized"}, status=403)
+
+        content = request.POST.get("content", "").strip()
+        if not content:
+            return JsonResponse({"success": False, "error": "Content required"}, status=400)
+
+        note.content = content
+        note.save()
+        return JsonResponse({"success": True, "content": note.content})
+
+
+class AnswerQuestionView(LoginRequiredMixin, View):
+    """Client submits an answer to a project question."""
+
+    def post(self, request, pk, question_id):
+        try:
+            project = Project.objects.get(pk=pk, client=request.user)
+            question = ProjectQuestion.objects.get(pk=question_id, project=project)
+        except (Project.DoesNotExist, ProjectQuestion.DoesNotExist):
+            return JsonResponse({"success": False, "error": "Not found"}, status=404)
+
+        if question.status == "answered":
+            return JsonResponse({"success": False, "error": "Already answered"}, status=400)
+
+        answer = request.POST.get("answer", "").strip()
+        if not answer:
+            return JsonResponse({"success": False, "error": "Answer is required"}, status=400)
+
+        question.answer = answer
+        question.status = "answered"
+        question.answered_at = timezone.now()
+        question.save()
+
+        return JsonResponse({"success": True, "message": "Answer saved"})
+
+
 class ApprovalActionView(LoginRequiredMixin, View):
     """Handle client approval actions (approve/reject/revise)."""
 
@@ -125,11 +222,13 @@ class ApprovalActionView(LoginRequiredMixin, View):
             approval = ProjectApproval.objects.get(pk=approval_id, project=project)
 
             # Check if user has access to this project
-            if project.client != request.user:
-                return JsonResponse(
-                    {"success": False, "error": "Access denied"},
-                    status=403
-                )
+            has_access = (
+                project.client == request.user
+                or request.user.is_staff
+                or project.collaborators.filter(pk=request.user.pk).exists()
+            )
+            if not has_access:
+                return JsonResponse({"success": False, "error": "Access denied"}, status=403)
 
             # Check if approval is still pending
             if approval.status != "pending":

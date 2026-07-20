@@ -6,71 +6,79 @@
 {% block content %}
 <div class="container py-5">
   <div class="row">
-    <div class="col-lg-8 mx-auto">
+    <div class="col-lg-7 mx-auto">
       <h1 class="display-6 fw-bold mb-4">Order {{ order.order_number }}</h1>
 
-      <div class="card mb-4">
-        <div class="card-body">
-          <h2 class="h5 mb-3">Order Information</h2>
-          <dl class="row">
-            <dt class="col-sm-4">Order Number:</dt>
-            <dd class="col-sm-8">{{ order.order_number }}</dd>
+      <div class="card">
+        <div class="card-body p-0">
 
-            <dt class="col-sm-4">Order Date:</dt>
-            <dd class="col-sm-8">{{ order.created|date:"F d, Y" }}</dd>
+          <!-- Order Info -->
+          <div class="px-4 py-3 border-bottom">
+            <label class="text-muted small d-block mb-1">Order Number</label>
+            <p class="mb-0 fw-semibold">{{ order.order_number }}</p>
+          </div>
+          <div class="px-4 py-3 border-bottom">
+            <label class="text-muted small d-block mb-1">Date Placed</label>
+            <p class="mb-0">{{ order.created|date:"F d, Y" }}</p>
+          </div>
 
-            <dt class="col-sm-4">Status:</dt>
-            <dd class="col-sm-8">
-              <span class="badge bg-{{ order.status|yesno:'success,warning,danger' }}">
-                {{ order.get_status_display }}
-              </span>
-            </dd>
-          </dl>
-        </div>
-      </div>
-
-      <div class="card mb-4">
-        <div class="card-body">
-          <h2 class="h5 mb-3">Service Details</h2>
-          <h3 class="h4 mb-3">{{ order.service_package.name }}</h3>
-          <p class="mb-3">{{ order.service_package.short_description }}</p>
-          <p class="text-muted small mb-0">Estimated: ${{ order.total_amount }}</p>
+          <!-- Service(s) -->
+          <div class="px-4 py-3 border-bottom">
+            <label class="text-muted small d-block mb-2">Service</label>
+            {% if order.items.exists %}
+              {% for item in order.items.all %}
+                <p class="fw-semibold mb-0">{{ item.service_package.name }}</p>
+                {% if item.service_package.short_description %}
+                  <p class="text-muted small mb-0">{{ item.service_package.short_description }}</p>
+                {% endif %}
+              {% endfor %}
+            {% elif order.service_package %}
+              <p class="fw-semibold mb-0">{{ order.service_package.name }}</p>
+              {% if order.service_package.short_description %}
+                <p class="text-muted small mb-0">{{ order.service_package.short_description }}</p>
+              {% endif %}
+            {% endif %}
+          </div>
 
           {% if order.custom_requirements %}
-            <h4 class="h6 mt-4 mb-2">Custom Requirements:</h4>
+          <div class="px-4 py-3 border-bottom">
+            <label class="text-muted small d-block mb-1">Custom Requirements</label>
             <p class="mb-0">{{ order.custom_requirements }}</p>
+          </div>
           {% endif %}
+
+          <!-- Contact Info -->
+          <div class="px-4 py-3 border-bottom">
+            <label class="text-muted small d-block mb-1">Name</label>
+            <p class="mb-0">{{ order.customer_name }}</p>
+          </div>
+          <div class="px-4 py-3 border-bottom">
+            <label class="text-muted small d-block mb-1">Email</label>
+            <p class="mb-0">{{ order.customer_email }}</p>
+          </div>
+          {% if order.customer_phone %}
+          <div class="px-4 py-3 border-bottom">
+            <label class="text-muted small d-block mb-1">Phone</label>
+            <p class="mb-0">{{ order.customer_phone }}</p>
+          </div>
+          {% endif %}
+          {% if order.company_name %}
+          <div class="px-4 py-3 border-bottom">
+            <label class="text-muted small d-block mb-1">Company</label>
+            <p class="mb-0">{{ order.company_name }}</p>
+          </div>
+          {% endif %}
+
+          <!-- Footer action -->
+          <div class="px-4 py-3 text-center">
+            <a href="{% url 'contact' %}" class="btn btn-outline-primary btn-sm">
+              Contact Support
+            </a>
+          </div>
+
         </div>
       </div>
 
-      <div class="card mb-4">
-        <div class="card-body">
-          <h2 class="h5 mb-3">Contact Information</h2>
-          <dl class="row mb-0">
-            <dt class="col-sm-4">Name:</dt>
-            <dd class="col-sm-8">{{ order.customer_name }}</dd>
-
-            <dt class="col-sm-4">Email:</dt>
-            <dd class="col-sm-8">{{ order.customer_email }}</dd>
-
-            {% if order.customer_phone %}
-              <dt class="col-sm-4">Phone:</dt>
-              <dd class="col-sm-8">{{ order.customer_phone }}</dd>
-            {% endif %}
-
-            {% if order.company_name %}
-              <dt class="col-sm-4">Company:</dt>
-              <dd class="col-sm-8">{{ order.company_name }}</dd>
-            {% endif %}
-          </dl>
-        </div>
-      </div>
-
-      <div class="mt-4 text-center">
-        <a href="{% url 'contact' %}" class="btn btn-outline-primary">
-          Contact Support
-        </a>
-      </div>
     </div>
   </div>
 </div>

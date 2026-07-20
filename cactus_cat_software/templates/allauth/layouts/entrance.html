@@ -1,41 +1,239 @@
 {% extends "base.html" %}
-{% load i18n %}
-{% block bodyclass %}bg-light{% endblock bodyclass %}
+{% load i18n static %}
 
-{% block css %}{{ block.super }}{% endblock css %}
 {% block title %}
-  {% block head_title %}
-    {% trans "Sign In" %}
-  {% endblock head_title %}
+  {% block head_title %}{% trans "Sign In" %}{% endblock head_title %}
 {% endblock title %}
+
+{% block css %}
+{{ block.super }}
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,400&display=swap" rel="stylesheet">
+<style>
+  html, body { background: #0a0c1a !important; }
+  body { font-family: 'Space Grotesk', sans-serif; }
+  #pageStars { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; }
+
+  .entrance-header {
+    position: relative; z-index: 10;
+    padding: 22px 40px;
+    border-bottom: 1px solid rgba(245,242,234,0.1);
+    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(10,12,26,0.7);
+    backdrop-filter: blur(10px);
+  }
+
+  .entrance-brand {
+    display: flex; align-items: center; gap: 10px;
+    text-decoration: none;
+  }
+  .entrance-brand img { height: 36px; width: auto; }
+  .entrance-brand-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem; letter-spacing: 0.08em;
+    color: rgba(245,242,234,0.85);
+  }
+
+  .entrance-wrap {
+    min-height: calc(100vh - 80px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 48px 16px 80px;
+    position: relative; z-index: 1;
+  }
+
+  .entrance-card {
+    width: 100%; max-width: 520px;
+    border: 1px solid rgba(131,163,132,0.3);
+    background: rgba(10,12,26,0.75);
+    backdrop-filter: blur(10px);
+    padding: 40px;
+    position: relative;
+  }
+
+  /* Form overrides */
+  .form-control, .form-select {
+    background: rgba(245,242,234,0.04) !important;
+    border: 1px solid rgba(131,163,132,0.25) !important;
+    color: #f5f2ea !important;
+    border-radius: 0 !important;
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-size: 17px !important;
+    padding: 11px 14px !important;
+  }
+  .form-control:focus, .form-select:focus {
+    border-color: rgba(131,163,132,0.6) !important;
+    box-shadow: 0 0 0 3px rgba(131,163,132,0.07) !important;
+    background: rgba(245,242,234,0.06) !important;
+  }
+  .form-control::placeholder { color: rgba(245,242,234,0.28) !important; }
+  .form-label {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 12px !important; letter-spacing: 0.18em !important;
+    text-transform: uppercase !important; color: rgba(245,242,234,0.55) !important;
+    font-weight: 400 !important; margin-bottom: 8px !important;
+  }
+  .invalid-feedback { font-family: 'JetBrains Mono', monospace; font-size: 13px; }
+  .is-invalid { border-color: rgba(224,92,106,0.5) !important; }
+  .form-check-input {
+    background-color: rgba(245,242,234,0.04) !important;
+    border: 1px solid rgba(131,163,132,0.35) !important;
+    border-radius: 0 !important;
+  }
+  .form-check-input:checked {
+    background-color: #83A384 !important;
+    border-color: #83A384 !important;
+  }
+  .form-check-input:focus { box-shadow: 0 0 0 3px rgba(131,163,132,0.12) !important; }
+  .form-check-label {
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-size: 15px !important;
+    color: rgba(245,242,234,0.55) !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
+  }
+
+  .btn { border-radius: 0 !important; }
+  .entrance-card [type="submit"] { width: 100%; margin-top: 8px; }
+  .btn-primary {
+    background: #83A384 !important; border-color: #83A384 !important;
+    color: #0a0c1a !important; font-family: 'Space Grotesk', sans-serif !important;
+    font-weight: 600 !important;
+  }
+  .btn-primary:hover { background: #6e8d6f !important; border-color: #6e8d6f !important; }
+
+  .alert { border-radius: 0; background: rgba(131,163,132,0.06); border-color: rgba(131,163,132,0.25); color: rgba(245,242,234,0.8); }
+  .alert-success { border-color: rgba(131,163,132,0.4); background: rgba(131,163,132,0.1); }
+  .alert-danger  { border-color: rgba(224,92,106,0.4); background: rgba(224,92,106,0.06); }
+
+  h1, h2, h3, h4 { font-family: 'Fraunces', serif !important; color: #f5f2ea !important; letter-spacing: -0.02em; }
+  p, li, small { color: rgba(245,242,234,0.6) !important; }
+  a { color: #83A384; }
+  a:hover { color: #a0c2a0; }
+
+  /* Password checklist */
+  .pw-checklist {
+    margin: -4px 0 16px;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .pw-check {
+    display: flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px; letter-spacing: 0.08em;
+    color: rgba(245,242,234,0.3);
+    transition: color 0.2s;
+  }
+  .pw-icon {
+    display: inline-flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(245,242,234,0.25);
+    font-size: 0;
+    transition: border-color 0.2s, font-size 0.15s;
+  }
+  .pw-check--met { color: #83A384; }
+  .pw-check--met .pw-icon {
+    border: none;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #83A384;
+  }
+
+  .entrance-back {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: rgba(245,242,234,0.3); text-decoration: none;
+    transition: color 0.2s;
+  }
+  .entrance-back:hover { color: #83A384; text-decoration: none; }
+</style>
+{% endblock css %}
+
 {% block body %}
-  <div class="d-flex justify-content-center h-100 py-4">
-    <div class="col-md-4 py-4 my-4 px-4">
-      <div class="text-end mb-3">
-        <a href="{% url 'home' %}" class="text-muted text-decoration-none small">Home <i class="bi bi-chevron-right"></i><i class="bi bi-chevron-right"></i></a>
+<canvas id="pageStars"></canvas>
+
+<!-- Branded header -->
+<header class="entrance-header">
+  <a href="{% url 'home' %}" class="entrance-brand">
+    <img src="{% static 'images/Cactus_Cat_Logo.png' %}" alt="Cactus Cat Software">
+    <span class="entrance-brand-name">CACTUS_CAT</span>
+  </a>
+  <a href="{% url 'home' %}" class="entrance-back">← Home</a>
+</header>
+
+<!-- Messages -->
+{% if messages %}
+  <div style="position:relative;z-index:2;padding:0 40px;margin-top:16px;max-width:520px;margin-left:auto;margin-right:auto;">
+    {% for message in messages %}
+      <div class="alert alert-dismissible {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>
-      {% if messages %}
-        {% for message in messages %}
-          <div class="alert alert-dismissible {% if message.tags %}alert-{{ message.tags }}{% endif %}">
-            {{ message }}
-            <button type="button"
-                    class="btn-close"
-                    data-bs-dismiss="alert"
-                    aria-label="Close"></button>
-          </div>
-        {% endfor %}
-      {% endif %}
-      {% block content %}
-      {% endblock content %}
-      {% block extra_body %}
-      {% endblock extra_body %}
-      {% if request.resolver_match.url_name != 'account_login' and request.resolver_match.url_name != 'account_signup' %}
-      <div class="text-center mt-4">
-        <a href="{% url 'account_login' %}" class="btn btn-outline-primary">
-          <i class="bi bi-arrow-left"></i> Back to Sign In
-        </a>
-      </div>
-      {% endif %}
-    </div>
+    {% endfor %}
   </div>
+{% endif %}
+
+<!-- Form area -->
+<div class="entrance-wrap">
+  <div class="entrance-card">
+    <span class="ds-corner ds-corner-tl"></span>
+    <span class="ds-corner ds-corner-tr"></span>
+    <span class="ds-corner ds-corner-bl"></span>
+    <span class="ds-corner ds-corner-br"></span>
+
+    {% block content %}{% endblock content %}
+    {% block extra_body %}{% endblock extra_body %}
+
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
 {% endblock body %}
+
+{% block inline_javascript %}
+{{ block.super }}
+<script>
+(function () {
+  const canvas = document.getElementById('pageStars');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = () => window.innerWidth, H = () => window.innerHeight;
+  const STAR_COUNT = 200, BANDS = 3;
+  let stars = [], scrollY = 0, smooth = 0;
+  function resize() { canvas.width = W(); canvas.height = H(); }
+  function init() {
+    stars = [];
+    for (let i = 0; i < STAR_COUNT; i++) {
+      const d = Math.random();
+      stars.push({ x: Math.random()*W(), pageY: Math.random()*H()*BANDS, depth: d,
+        r: 0.15+d*d*2.6, oBase: 0.08+d*0.78, twA: 0.15+d*0.55,
+        twS: 0.0008+d*0.0035, ph: Math.random()*Math.PI*2,
+        warm: d>0.7&&Math.random()<0.18, cool: d>0.85&&Math.random()<0.12, glow: d>0.72 });
+    }
+  }
+  function draw() {
+    ctx.clearRect(0,0,W(),H());
+    stars.forEach(s => {
+      const pf = 0.05+s.depth*0.95, sy = s.pageY - smooth*pf;
+      if (sy < -10 || sy > H()+10) return;
+      s.ph += s.twS;
+      const op = Math.max(0,Math.min(1,s.oBase*(1-s.twA*(0.5+0.5*Math.sin(s.ph)))));
+      const col = s.warm?`rgba(255,215,150,${op})`:s.cool?`rgba(180,210,255,${op})`:`rgba(235,242,255,${op})`;
+      if (s.glow&&s.r>1.5) {
+        const g=ctx.createRadialGradient(s.x,sy,0,s.x,sy,s.r*5);
+        g.addColorStop(0,s.warm?`rgba(255,200,100,${op*0.18})`:`rgba(200,220,255,${op*0.14})`);
+        g.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.beginPath();ctx.arc(s.x,sy,s.r*5,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();
+      }
+      ctx.beginPath();ctx.arc(s.x,sy,s.r,0,Math.PI*2);ctx.fillStyle=col;ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener('scroll',()=>{scrollY=window.scrollY;},{passive:true});
+  (function tick(){smooth+=(scrollY-smooth)*0.07;requestAnimationFrame(tick);})();
+  resize(); init(); draw();
+  window.addEventListener('resize',()=>{resize();init();});
+})();
+</script>
+{% endblock inline_javascript %}

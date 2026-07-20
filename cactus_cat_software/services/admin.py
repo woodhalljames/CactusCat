@@ -42,7 +42,7 @@ class ServicePackageAdmin(admin.ModelAdmin):
         (
             "Details",
             {
-                "fields": ("features", "description", "image"),
+                "fields": ("features", "who_its_for", "description", "image"),
             },
         ),
         (
@@ -56,6 +56,17 @@ class ServicePackageAdmin(admin.ModelAdmin):
             },
         ),
         (
+            "Financing Options",
+            {
+                "fields": ("setup_fee", "monthly_price"),
+                "description": (
+                    "Optional. If set, a 'Financing available' popup appears on the service page "
+                    "showing the setup fee + monthly rate as an alternative to paying in full. "
+                    "All payment arrangements are handled manually."
+                ),
+            },
+        ),
+        (
             "Display",
             {
                 "fields": ("is_active", "display_order"),
@@ -64,8 +75,13 @@ class ServicePackageAdmin(admin.ModelAdmin):
     )
 
     def price_display(self, obj):
-        if obj.is_price_starting_from:
-            return format_html("Starting from <strong>${}</strong>", obj.price)
-        return format_html("<strong>${}</strong>", obj.price)
+        base = f"Starting from ${obj.price}" if obj.is_price_starting_from else f"${obj.price}"
+        if obj.setup_fee and obj.monthly_price:
+            return format_html(
+                "<strong>{}</strong> <span style='color:#6c757d;font-size:0.85em;'>"
+                "· financing: ${}/mo</span>",
+                base, obj.monthly_price,
+            )
+        return format_html("<strong>{}</strong>", base)
 
     price_display.short_description = "Price"

@@ -10,14 +10,6 @@ from model_utils.models import TimeStampedModel
 class Order(TimeStampedModel):
     """Orders placed by customers (guest or authenticated)."""
 
-    STATUS_CHOICES = [
-        ("pending", _("Pending")),
-        ("confirmed", _("Confirmed")),
-        ("in_progress", _("In Progress")),
-        ("completed", _("Completed")),
-        ("cancelled", _("Cancelled")),
-    ]
-
     # Unique identifier
     order_number = models.CharField(
         _("Order Number"),
@@ -44,6 +36,21 @@ class Order(TimeStampedModel):
     # Company Information
     company_name = models.CharField(_("Company Name"), max_length=200, blank=True)
 
+    # Timeline
+    TIMELINE_CHOICES = [
+        ("asap", "As soon as possible"),
+        ("1_month", "Within 1 month"),
+        ("1_3_months", "1 – 3 months"),
+        ("3_6_months", "3 – 6 months"),
+        ("flexible", "Flexible / just exploring"),
+    ]
+    timeline = models.CharField(
+        _("Timeline"),
+        max_length=20,
+        choices=TIMELINE_CHOICES,
+        blank=True,
+    )
+
     # Order Details (for legacy single-item orders)
     service_package = models.ForeignKey(
         "services.ServicePackage",
@@ -53,6 +60,12 @@ class Order(TimeStampedModel):
         null=True,
         blank=True,
     )
+    budget_range = models.CharField(
+        _("Budget Range"),
+        max_length=100,
+        blank=True,
+        help_text="Client's stated budget or range",
+    )
     custom_requirements = models.TextField(
         _("Custom Requirements"),
         blank=True,
@@ -60,17 +73,22 @@ class Order(TimeStampedModel):
     )
 
     # Pricing
+    PRICING_TYPE_BUYOUT = "buyout"
+    PRICING_TYPE_SUBSCRIPTION = "subscription"
+    PRICING_TYPE_CHOICES = [
+        (PRICING_TYPE_BUYOUT, _("Buyout (Own)")),
+        (PRICING_TYPE_SUBSCRIPTION, _("Monthly Subscription")),
+    ]
+    pricing_type = models.CharField(
+        _("Pricing Type"),
+        max_length=20,
+        choices=PRICING_TYPE_CHOICES,
+        default=PRICING_TYPE_BUYOUT,
+    )
     total_amount = models.DecimalField(
         _("Total Amount"),
         max_digits=10,
         decimal_places=2,
-    )
-
-    # Status
-    status = models.CharField(
-        max_length=20,
-        choices=STATUS_CHOICES,
-        default="pending",
     )
 
     # Internal Notes

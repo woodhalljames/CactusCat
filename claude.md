@@ -1,103 +1,141 @@
-Project: software dev, digital marketing, and cybersecurity website using django tech stack
-Tech: django-cookie-cutter, Django, html, css, JS.
-Goals for session: Improve beta dashboard to also accomodate Beta Server Deployment System. Clients can see their website as its produced 
-Architecture:
+Going to reorganize our services by separating them into 3–5 main service categories max.
+Too many categories makes the company feel unfocused.
+This structure fits what you described very well:
 
-Your VPS runs a main Django app (your admin dashboard)
-Each client project is a separate Docker container
-Nginx reverse proxy routes yourdomain.com/user/theirwebsite → container 1, yourdomain.com/user/theirwebsite2 → container 2
-Each project gets its own subdomain or path
+1. Custom Software Development
+This is your “build” category.
+Include:
+Web Applications
+Mobile Applications
+SaaS Platforms
+Customer Portals
+Internal Business Tools
+API Development
+Database Systems
+Admin Dashboards
+Positioning:
+Custom-built software tailored to your business operations and customer experience.
+This becomes your premium/high-ticket category.
 
-Admin workflow:
+2. Automation & AI Systems
+This is likely your strongest differentiator.
+Include:
+Workflow Automation
+Business Process Automation
+AI Integrations
+CRM Automation
+Reporting Systems
+Data Synchronization
+Email/SMS Automation
+Scheduling Automation
+Custom Scripts
+Third-Party Integrations
+Positioning:
+Reduce manual work, eliminate repetitive tasks, and connect your business systems.
+This category sells extremely well because ROI is easy to explain.
 
-You add a project in your Django admin
-Provide GitHub repo URL + branch
-System clones repo, builds Docker image, spins up container
-Automatically provisions subdomain and SSL cert (Let's Encrypt)
-Client gets access via their project dashboard
+3. Technical Marketing & Growth
+This bridges software + marketing.
+Include:
+Technical SEO
+Landing Pages
+Analytics & Tracking
+Conversion Optimization
+Marketing Automation
+Funnel Systems
+CRM Setup
+Lead Generation Infrastructure
+Email Campaign Systems
+Positioning:
+Build the technical foundation behind scalable marketing and customer acquisition.
+This is important because businesses often need BOTH software and lead generation systems.
 
-Key components to research:
+4. Infrastructure & Support
+This makes you look like a long-term partner instead of just a developer.
+Include:
+Hosting & Deployment
+Website Management
+App Maintenance
+Security Updates
+Performance Optimization
+Cloud Infrastructure
+Monitoring
+Technical Support
+DevOps
+Backup Systems
+Positioning:
+Reliable infrastructure and ongoing support to keep your systems running smoothly.
+This category helps justify monthly retainers.
 
-Docker SDK for Python - lets Django control Docker programmatically
-GitHub webhooks - auto-deploy on push to specific branch
-Traefik or Nginx - dynamic routing to containers
-Celery - handle builds/deployments as background tasks so admin doesn't hang
+Optional 5th Category:
+Strategy & Consulting
+Only add this if you actually want advisory work.
+Include:
+Automation Audits
+Software Planning
+Digital Transformation
+Technical Roadmapping
+System Architecture
+SaaS Consulting
+Positioning:
+Identify inefficiencies and design scalable technical solutions.
 
-Security considerations:
+BEST WEBSITE STRUCTURE
+Home
+High-level positioning.
+Services
+Then break into:
+Custom Software Development
+Automation & AI Systems
+Technical Marketing
+Infrastructure & Support
+Solutions
+Industry-specific pages.
+Examples:
+Automation for Contractors
+Software for Real Estate Teams
+AI Systems for Local Businesses
+Internal Tools for Operations Teams
+These pages rank much better for SEO.
 
-Each container isolated
-Client-specific authentication
-Resource limits per container (CPU/memory) Keep it low
-Separate networks for each project
+Important Strategic Advice
+Avoid organizing by technologies.
+Bad:
+React
+Node
+Python
+AWS
+Businesses do not care.
+Organize by:
+problems solved,
+business outcomes,
+operational improvements.
+
+How Agencies Usually Mess This Up
+They create categories like:
+Web Design
+Development
+Marketing
+SEO
+IT
+That sounds generic and low-value.
+Your advantage is:
+operations + automation + software.
+That’s much more modern and higher value.
+
+What You REALLY Sell
+Not:
+websites,
+apps,
+scripts.
+You sell:
+efficiency,
+scalability,
+automation,
+operational leverage.
+That’s the messaging you want everywhere.
 
 
-Preferences: Simple solutions that work.  Front end design and UX that WOWS. 
+A Very Strong Overall Company Tagline
+Streamline operations. Automate workflows. Building better software.
 
-
-I will run all migrations as necessary. 
-
-
-
-
-
-
-
-Required VPS Setup                                                            
-                                                                                
-  1. Create the Docker Network (one-time)                                       
-                                                                                
-  The client containers need to join the traefik-public network to be routable  
-  via Traefik. Create it before deploying:                                      
-                                                                                
-  docker network create traefik-public                                          
-                                                                                
-  This network is referenced in your compose file but external containers       
-  spawned by Celery need it to exist.                                           
-                                                                                
-  2. Verify Docker Socket Permissions                                           
-                                                                                
-  Your celeryworker mounts /var/run/docker.sock. The container process needs    
-  permission to use it. Two options:                                            
-                                                                                
-  Option A: Add the celeryworker user to the docker group inside the container  
-  Option B: Ensure the socket is readable (less secure):                        
-  chmod 666 /var/run/docker.sock                                                
-                                                                                
-  3. Schedule the Health Check Task                                             
-                                                                                
-  Since you're using DatabaseScheduler, add the periodic health check via Django
-   admin:                                                                       
-  - Go to Admin → Periodic Tasks → Add                                          
-  - Task: cactus_cat_software.projects.tasks.check_container_health             
-  - Schedule: Every 5 minutes (or your preference)                              
-                                                                                
-  4. Ensure Git is Installed                                                    
-                                                                                
-  The build_and_deploy task runs git clone. Git should be in your               
-  Django/celeryworker Docker image (likely already there).                      
-                                                                                
-  ---                                                                           
-  What's Already Configured Correctly                                           
-                                                                                
-  - Traefik Docker provider (docker-compose.production.yml:49)                  
-  - Path-based routing exclusion in traefik.yml:35 for *-preview paths          
-  - Celeryworker Docker socket mount (docker-compose.production.yml:69)         
-  - Celeryworker on traefik-public network (docker-compose.production.yml:71-72)
-  - docker Python package in dependencies (pyproject.toml:180)                  
-                                                                                
-  ---                                                                           
-  Security Consideration                                                        
-                                                                                
-  Client containers on traefik-public can potentially reach your internal       
-  services (postgres, redis). Consider adding network policies or running client
-   containers on a separate isolated network if this is a concern.              
-                                                                                
-  ---                                                                           
-  Testing                                                                       
-                                                                                
-  After deploying, test with a simple project that has a Dockerfile. Create a   
-  ProjectDeployment in admin, then trigger build_and_deploy manually via Flower 
-  or Django shell:                                                              
-                                                                                
-  from cactus_cat_software.projects.tasks import build_and_deploy               
-  build_and_deploy.delay(deployment_id)   

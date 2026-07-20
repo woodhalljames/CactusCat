@@ -10,9 +10,9 @@ class BlogPostAdmin(SummernoteModelAdmin):
     """Simple admin interface for blog posts."""
 
     # Simple list view
-    list_display = ["title", "status", "featured", "published_date"]
+    list_display = ["title", "author", "status", "featured", "published_date"]
     list_filter = ["status", "featured"]
-    search_fields = ["title", "excerpt"]
+    search_fields = ["title", "excerpt", "author"]
     prepopulated_fields = {"slug": ("title",)}
 
     # Rich text editor
@@ -22,19 +22,17 @@ class BlogPostAdmin(SummernoteModelAdmin):
     fields = [
         "title",
         "slug",
+        "author",
         "excerpt",
         "content",
         "featured_image",
         "status",
+        "published_date",
         "featured",
         "meta_description",
     ]
 
     def save_model(self, request, obj, form, change):
-        # Auto-set author if not set
-        if not obj.author:
-            obj.author = request.user
-
         # Auto-set published date when status changes to published
         if obj.status == "published" and not obj.published_date:
             obj.published_date = timezone.now()

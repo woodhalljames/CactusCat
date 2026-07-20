@@ -1,77 +1,156 @@
 {% extends "base.html" %}
 {% load static crispy_forms_tags %}
 
-{% block title %}Checkout - Cactus Cat Software{% endblock %}
+{% block title %}Request a Quote | Cactus Cat Software{% endblock %}
+
+{% block css %}
+{{ block.super }}
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,400&display=swap" rel="stylesheet">
+<style>
+  html { background: #0a0c1a; }
+  body { font-family: 'Space Grotesk', sans-serif; background: transparent !important; }
+  #pageStars { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; }
+  footer { background: transparent !important; position: relative; z-index: 1; }
+
+  .checkout-wrap {
+    min-height: calc(100vh - 80px);
+    display: flex; align-items: flex-start; justify-content: center;
+    padding: 72px 16px 100px;
+    position: relative; z-index: 1;
+  }
+
+  .checkout-card {
+    width: 100%; max-width: 600px;
+    border: 1px solid rgba(131,163,132,0.3);
+    background: rgba(10,12,26,0.75);
+    backdrop-filter: blur(10px);
+    padding: 40px;
+    position: relative;
+  }
+
+  .service-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 3px 12px;
+    border: 1px solid rgba(131,163,132,0.3);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: #83A384;
+  }
+
+  .form-control, .form-select {
+    background: rgba(245,242,234,0.04) !important;
+    border: 1px solid rgba(131,163,132,0.25) !important;
+    color: #f5f2ea !important;
+    border-radius: 0 !important;
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-size: 15px !important;
+    padding: 11px 14px !important;
+  }
+  .form-control:focus, .form-select:focus {
+    border-color: rgba(131,163,132,0.6) !important;
+    box-shadow: 0 0 0 3px rgba(131,163,132,0.07) !important;
+    background: rgba(245,242,234,0.06) !important;
+  }
+  .form-control::placeholder { color: rgba(245,242,234,0.28) !important; }
+  textarea.form-control { resize: vertical; min-height: 120px; }
+  .form-label {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 10px !important; letter-spacing: 0.18em !important;
+    text-transform: uppercase !important; color: rgba(245,242,234,0.55) !important;
+    font-weight: 400 !important; margin-bottom: 8px !important;
+  }
+  .invalid-feedback { font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+  .is-invalid { border-color: rgba(224,92,106,0.5) !important; }
+  .btn { border-radius: 0 !important; }
+  select.form-select option { background: #0a0c1a; color: #f5f2ea; }
+</style>
+{% endblock css %}
 
 {% block content %}
-<div class="container py-5">
-  <div class="row">
-    <div class="col-lg-8 mx-auto">
-      <h1 class="display-5 fw-bold mb-4">Checkout</h1>
+<canvas id="pageStars"></canvas>
 
-      <div class="row">
-        <!-- Order Summary -->
-        <div class="col-md-5 mb-4">
-          <div class="card">
-            <div class="card-header">
-              <h2 class="h5 mb-0">Order Summary</h2>
-            </div>
-            <div class="card-body">
-              <ul class="list-unstyled mb-3">
-                {% for item in cart %}
-                  <li class="mb-3 pb-3 border-bottom">
-                    <div>
-                      <h5 class="mb-2">{{ item.service.name }}</h5>
-                      <p class="text-muted small mb-2">{{ item.service.short_description }}</p>
-                      <small class="text-muted" style="font-size: 0.75rem;">${{ item.total_price }}</small>
-                    </div>
-                  </li>
-                {% endfor %}
-              </ul>
-              <div class="d-flex justify-content-between border-top pt-3">
-                <span class="text-muted">Estimated Total:</span>
-                <span class="text-muted">${{ cart.get_total_price }}</span>
-              </div>
-              <div class="alert alert-info mt-3 mb-0">
-                <small>
-                  <i class="bi bi-info-circle me-1"></i>
-                  No payment required now. We'll send you a detailed quote within 24 hours.
-                </small>
-              </div>
-            </div>
-          </div>
-        </div>
+<div class="checkout-wrap">
+  <div class="checkout-card">
+    <span class="ds-corner ds-corner-tl"></span>
+    <span class="ds-corner ds-corner-tr"></span>
+    <span class="ds-corner ds-corner-bl"></span>
+    <span class="ds-corner ds-corner-br"></span>
 
-        <!-- Checkout Form -->
-        <div class="col-md-7">
-          <div class="card">
-            <div class="card-header">
-              <h2 class="h5 mb-0">Contact & Business Information</h2>
-            </div>
-            <div class="card-body">
-              <p class="text-muted mb-4">
-                Please provide your contact details so we can send you a quote and keep you updated on your project.
-              </p>
-              {% crispy form %}
-            </div>
-          </div>
-
-          <div class="card mt-3">
-            <div class="card-body">
-              <h3 class="h6 mb-3">
-                <i class="bi bi-shield-check me-2" style="color: var(--primary);"></i>
-                What Happens Next
-              </h3>
-              <ol class="mb-0 ps-3">
-                <li class="mb-2 text-muted small">We'll review your order and schedule a meeting</li>
-                <li class="mb-2 text-muted small">Once approved, we'll create your project dashboard</li>
-                <li class="mb-2 text-muted small">Track progress and receive updates every step of the way</li>
-              </ol>
-            </div>
-          </div>
-        </div>
+    <div style="margin-bottom:28px;">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.25em;text-transform:uppercase;color:#83A384;">· Quote request</span>
+      <h1 style="font-family:'Fraunces',serif;font-size:2rem;font-weight:700;color:#f5f2ea;letter-spacing:-0.02em;margin:8px 0 16px;">Give us as much info as possible.</h1>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">
+        {% for item in cart %}
+          <span class="service-chip">{{ item.service.name }}</span>
+        {% endfor %}
       </div>
+    </div>
+
+    <div style="border-top:1px solid rgba(131,163,132,0.15);padding-top:28px;">
+      {% crispy form %}
+    </div>
+
+    <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(245,242,234,0.08);">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;color:rgba(245,242,234,0.3);">
+        No payment or commitment required.
+        {% if not user.is_authenticated %}
+          <a href="{% url 'account_signup' %}?next={{ request.path }}" style="color:#83A384;">Create an account</a> to track progress and give input as we build.
+        {% endif %}
+      </span>
+    </div>
+
+    <div style="margin-top:12px;">
+      <a href="{% url 'orders:cart_detail' %}" style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(245,242,234,0.3);text-decoration:none;">
+        ← Back to quote builder
+      </a>
     </div>
   </div>
 </div>
 {% endblock %}
+
+{% block inline_javascript %}
+{{ block.super }}
+<script>
+(function () {
+  const canvas = document.getElementById('pageStars');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = () => window.innerWidth, H = () => window.innerHeight;
+  const STAR_COUNT = 220, BANDS = 3;
+  let stars = [], scrollY = 0, smooth = 0;
+  function resize() { canvas.width = W(); canvas.height = H(); }
+  function init() {
+    stars = [];
+    for (let i = 0; i < STAR_COUNT; i++) {
+      const d = Math.random();
+      stars.push({ x: Math.random()*W(), pageY: Math.random()*H()*BANDS, depth: d,
+        r: 0.15+d*d*2.6, oBase: 0.08+d*0.78, twA: 0.15+d*0.55,
+        twS: 0.0008+d*0.0035, ph: Math.random()*Math.PI*2,
+        warm: d>0.7&&Math.random()<0.18, cool: d>0.85&&Math.random()<0.12, glow: d>0.72 });
+    }
+  }
+  function draw() {
+    ctx.clearRect(0,0,W(),H());
+    stars.forEach(s => {
+      const pf = 0.05+s.depth*0.95, sy = s.pageY - smooth*pf;
+      if (sy < -10 || sy > H()+10) return;
+      s.ph += s.twS;
+      const op = Math.max(0,Math.min(1,s.oBase*(1-s.twA*(0.5+0.5*Math.sin(s.ph)))));
+      const col = s.warm?`rgba(255,215,150,${op})`:s.cool?`rgba(180,210,255,${op})`:`rgba(235,242,255,${op})`;
+      if (s.glow&&s.r>1.5) {
+        const g=ctx.createRadialGradient(s.x,sy,0,s.x,sy,s.r*5);
+        g.addColorStop(0,s.warm?`rgba(255,200,100,${op*0.18})`:`rgba(200,220,255,${op*0.14})`);
+        g.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.beginPath();ctx.arc(s.x,sy,s.r*5,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();
+      }
+      ctx.beginPath();ctx.arc(s.x,sy,s.r,0,Math.PI*2);ctx.fillStyle=col;ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener('scroll',()=>{scrollY=window.scrollY;},{passive:true});
+  (function tick(){smooth+=(scrollY-smooth)*0.07;requestAnimationFrame(tick);})();
+  resize(); init(); draw();
+  window.addEventListener('resize',()=>{resize();init();});
+})();
+</script>
+{% endblock inline_javascript %}

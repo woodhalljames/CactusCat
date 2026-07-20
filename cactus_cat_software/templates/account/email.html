@@ -1,0 +1,101 @@
+{% extends "account/base_entrance.html" %}
+{% load static allauth i18n %}
+
+{% block head_title %}Email Addresses{% endblock %}
+
+{% block content %}
+
+  <div style="margin-bottom:28px;">
+    <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:#83A384;">· Account</span>
+    <h1 style="font-family:'Fraunces',serif;font-size:2rem;font-weight:700;color:#f5f2ea;letter-spacing:-0.02em;margin:8px 0 0;">Email Addresses</h1>
+  </div>
+
+  {% if emailaddresses %}
+
+    <p style="font-family:'Space Grotesk',sans-serif;font-size:14px;color:rgba(245,242,234,0.55);margin-bottom:20px;">
+      Manage the email addresses associated with your account.
+    </p>
+
+    {% url 'account_email' as email_url %}
+    <form method="post" action="{{ email_url }}" id="emailForm">
+      {% csrf_token %}
+
+      <div style="border:1px solid rgba(131,163,132,0.2);margin-bottom:20px;">
+        {% for radio in emailaddress_radios %}
+          {% with emailaddress=radio.emailaddress %}
+            <label for="{{ radio.id }}" style="display:flex;align-items:center;gap:14px;padding:14px 16px;cursor:pointer;border-bottom:1px solid rgba(131,163,132,0.1);transition:background 0.15s;"
+                   onmouseover="this.style.background='rgba(131,163,132,0.05)'" onmouseout="this.style.background='transparent'">
+              <input type="radio" name="email" value="{{ emailaddress.email }}" id="{{ radio.id }}"
+                     {% if radio.checked %}checked{% endif %}
+                     style="accent-color:#83A384;width:16px;height:16px;flex-shrink:0;">
+              <div style="flex:1;min-width:0;">
+                <div style="font-family:'Space Grotesk',sans-serif;font-size:15px;color:#f5f2ea;word-break:break-all;">
+                  {{ emailaddress.email }}
+                </div>
+                <div style="display:flex;gap:6px;margin-top:5px;flex-wrap:wrap;">
+                  {% if emailaddress.primary %}
+                    <span style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;padding:2px 8px;border:1px solid rgba(131,163,132,0.4);color:#83A384;">Primary</span>
+                  {% endif %}
+                  {% if emailaddress.verified %}
+                    <span style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;padding:2px 8px;border:1px solid rgba(131,163,132,0.3);color:rgba(131,163,132,0.8);">Verified</span>
+                  {% else %}
+                    <span style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;padding:2px 8px;border:1px solid rgba(232,184,109,0.4);color:#e8b86d;">Unverified</span>
+                  {% endif %}
+                </div>
+              </div>
+            </label>
+          {% endwith %}
+        {% endfor %}
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:28px;">
+        <button type="submit" name="action_primary" class="btn btn-primary" style="font-size:13px;padding:10px;">
+          Make Primary
+        </button>
+        <button type="submit" name="action_send" class="btn" style="font-size:13px;padding:10px;border:1px solid rgba(131,163,132,0.3);background:transparent;color:rgba(245,242,234,0.7);">
+          Re-send Verification
+        </button>
+        <button type="submit" name="action_remove" class="btn" style="font-size:13px;padding:10px;border:1px solid rgba(224,92,106,0.3);background:transparent;color:rgba(224,92,106,0.8);"
+                onclick="return confirm('Remove this email address?')">
+          Remove
+        </button>
+      </div>
+    </form>
+
+  {% else %}
+    <div style="padding:20px;border:1px dashed rgba(131,163,132,0.2);margin-bottom:28px;">
+      <p style="font-family:'Space Grotesk',sans-serif;font-size:14px;color:rgba(245,242,234,0.45);margin:0;">
+        No email addresses are associated with your account yet.
+      </p>
+    </div>
+  {% endif %}
+
+  {% if can_add_email %}
+    <div style="border-top:1px solid rgba(131,163,132,0.15);padding-top:24px;">
+      <h2 style="font-family:'Fraunces',serif;font-size:1.2rem;font-weight:600;color:#f5f2ea;margin-bottom:16px;">Add Email Address</h2>
+      {% url 'account_email' as action_url %}
+      <form method="post" action="{{ action_url }}">
+        {% csrf_token %}
+        {% element fields form=form %}{% endelement %}
+        <button type="submit" name="action_add" class="btn btn-primary w-100" style="margin-top:8px;font-size:13px;padding:10px;">
+          Add Email
+        </button>
+      </form>
+    </div>
+  {% endif %}
+
+  <div style="margin-top:24px;padding-top:20px;border-top:1px solid rgba(245,242,234,0.08);">
+    <a href="{% url 'projects:dashboard' %}" style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(245,242,234,0.35);text-decoration:none;">
+      ← Back to dashboard
+    </a>
+  </div>
+
+{% endblock content %}
+
+{% block extra_body %}
+  <script src="{% static 'account/js/account.js' %}"></script>
+  <script src="{% static 'account/js/onload.js' %}"></script>
+  <script data-allauth-onload="allauth.account.forms.manageEmailForm" type="application/json">{
+    "i18n": {"confirmDelete": "{% trans 'Do you really want to remove the selected email address?' %}"}
+  }</script>
+{% endblock extra_body %}

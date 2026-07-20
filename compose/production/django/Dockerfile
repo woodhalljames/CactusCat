@@ -85,7 +85,7 @@ ENV PATH="/app/.venv/bin:$PATH"
 
 USER django
 
-RUN DATABASE_URL="" \
+RUN POSTGRES_DB="" POSTGRES_USER="" POSTGRES_PASSWORD="" \
   DJANGO_SETTINGS_MODULE="config.settings.test" \
   python manage.py compilemessages
 
