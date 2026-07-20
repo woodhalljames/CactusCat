@@ -39,6 +39,42 @@
     line-height: 1.6;
     margin-bottom: 32px;
   }
+  .contact-email-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  .contact-email-link {
+    color: #83A384;
+    text-decoration: none;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    letter-spacing: 0.02em;
+    border-bottom: 1px solid rgba(131,163,132,0.4);
+    padding-bottom: 2px;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .contact-email-link:hover {
+    color: #a4c4a5;
+    border-color: currentColor;
+  }
+  .contact-copy-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: #83A384;
+    cursor: pointer;
+    padding: 4px;
+    font-size: 15px;
+    line-height: 1;
+    transition: color 0.2s;
+  }
+  .contact-copy-btn:hover {
+    color: #a4c4a5;
+  }
 </style>
 {% endblock css %}
 
@@ -53,8 +89,35 @@
 
       <div class="contact-title">Say hello.</div>
       <p class="contact-body">Questions, comments, concerns?</p>
-      <a href="mailto:hello@cactuscatsoftware.com" class="ds-btn-solid" style="justify-content:center; width:100%;">hello@cactuscatsoftware.com <span>↗</span></a>
+      <div class="contact-email-row">
+        <a href="mailto:hello@cactuscatsoftware.com" class="contact-email-link">hello@cactuscatsoftware.com</a>
+        <button type="button" class="contact-copy-btn" id="copyEmailBtn" aria-label="Copy email address">
+          <i class="bi bi-clipboard" id="copyEmailIcon"></i>
+        </button>
+      </div>
     </div>
   </div>
 </section>
 {% endblock content %}
+
+{% block inline_javascript %}
+{{ block.super }}
+<script>
+  (function () {
+    const btn = document.getElementById('copyEmailBtn');
+    const icon = document.getElementById('copyEmailIcon');
+    if (!btn || !icon) return;
+
+    btn.addEventListener('click', function () {
+      navigator.clipboard.writeText('hello@cactuscatsoftware.com').then(function () {
+        icon.classList.remove('bi-clipboard');
+        icon.classList.add('bi-clipboard-check');
+        setTimeout(function () {
+          icon.classList.remove('bi-clipboard-check');
+          icon.classList.add('bi-clipboard');
+        }, 1500);
+      });
+    });
+  })();
+</script>
+{% endblock inline_javascript %}
